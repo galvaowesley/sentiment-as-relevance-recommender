@@ -92,11 +92,13 @@ pip install -r requirements.txt
 | Branch | Descrição |
 |---|---|
 | `main` | Código base, pré-processamento e estrutura geral |
+| `eda` | Análise exploratória do corpus B2W-Reviews01 |
 | `sentiment_classifier` | Pipeline 1 — classificadores de sentimento (TF-IDF LR, BERTimbau) |
 | `recommender` | Pipeline 2 — motor de recomendação orientado por sentimento |
 
 ```bash
 # Acessar uma branch específica
+git checkout eda
 git checkout sentiment_classifier
 git checkout recommender
 ```
