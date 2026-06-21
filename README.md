@@ -62,6 +62,47 @@ sentiment-as-relevance-recommender/
 
 ---
 
+## Instalação
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/galvaowesley/sentiment-as-relevance-recommender.git
+cd sentiment-as-relevance-recommender
+```
+
+### 2. Criar e ativar o ambiente
+
+```bash
+# Com mamba/conda
+mamba create -n nlp_project python=3.13
+mamba activate nlp_project
+```
+
+### 3. Instalar dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Branches
+
+| Branch | Descrição |
+|---|---|
+| `main` | Código base, pré-processamento e estrutura geral |
+| `sentiment_classifier` | Pipeline 1 — classificadores de sentimento (TF-IDF LR, BERTimbau) |
+| `recommender` | Pipeline 2 — motor de recomendação orientado por sentimento |
+
+```bash
+# Acessar uma branch específica
+git checkout sentiment_classifier
+git checkout recommender
+```
+
+---
+
 ## Dados
 
 O corpus **B2W-Reviews01** (~50MB) não está versionado no repositório. Para obtê-lo:
