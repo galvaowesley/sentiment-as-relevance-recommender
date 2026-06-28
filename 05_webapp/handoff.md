@@ -28,6 +28,33 @@ Consulta (produto ou texto livre)
 
 ---
 
+## Como é calculada a similaridade?
+
+### Resposta curta
+
+> **Os embeddings são pré-computados (offline). A busca de vizinhos acontece em tempo real, mas é rápida (ms) graças ao índice HNSW.**
+
+### Detalhes
+
+| Etapa | Quando | O que acontece |
+|-------|--------|----------------|
+| **Embedding dos documentos** | Build time (offline) | Títulos dos produtos do corpus são codificados com `Qwen3-Embedding-0.6B` sem prefixo de instrução; vetores (1024-d, float32, L2-normalizados) salvos em `corpus_embeddings.npy` |
+| **Construção do índice HNSW** | Build time (offline) | `zvec` constrói um grafo HNSW com métrica cosseno sobre os vetores salvos; índice persiste em `artifacts/corpus/` |
+| **Embedding da query** | Query time — só se necessário | Se a query for um `product_id` já no corpus → embedding recuperado diretamente do `.npy` (sem inferência). Se for texto livre → o modelo é chamado uma vez, com prefixo de instrução (`encode_queries`) |
+| **ANN search** | Query time — sempre | `zvec` executa busca ANN no grafo HNSW; retorna top-N candidatos com distância cosseno em O(log N) — tipicamente < 10 ms |
+| **Similaridade** | Query time | `sim = 1 − distância_cosseno` (vetores L2-normalizados: produto interno = cosseno) |
+| **Re-rank** | Query time | `score = α · sim + (1−α) · S(p)` com α = 0.5 padrão |
+
+### Por que cosseno?
+
+O modelo usa retrieval **assimétrico**: corpus codificado sem instrução, query codificada com prefixo. Isso segue a recomendação do Qwen3-Embedding para tasks de recuperação. Como os vetores são L2-normalizados, o produto interno é numericamente equivalente ao cosseno — `zvec` usa `COSINE` como `MetricType`.
+
+### Implicação para escala
+
+Com o corpus atual (~2k produtos), a busca é instantânea mesmo sem índice. Ao escalar para todo o val+test (~50k produtos), o HNSW continua sub-linear e sem necessidade de reembedding.
+
+---
+
 ## Splits de dados e seus papéis
 
 | Split | Uso | Inclui neutros (rating=3)? |
