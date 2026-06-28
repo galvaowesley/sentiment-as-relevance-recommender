@@ -1,7 +1,12 @@
 # vector_store — Banco Vetorial e Busca ANN
 
-Indexa os embeddings de títulos gerados em `../vectorizer/` e realiza a busca por **Approximate Nearest Neighbors (ANN)** com similaridade de cosseno.
+Indexa os embeddings de títulos gerados em `../vectorizer/` e realiza busca por
+**Approximate Nearest Neighbors (ANN)** com similaridade de cosseno usando o
+**zvec** (índice HNSW, métrica COSINE).
 
-**Candidatos de banco vetorial:** FAISS, ChromaDB ou Qdrant (a definir na etapa de implementação).
+Dado o produto de consulta `q`, recupera os **Top-K** títulos mais similares do
+índice (`K = retrieve_k` em `config.py`). O zvec reporta *distância* de cosseno;
+o wrapper converte para similaridade com `sim = 1 − distância`.
 
-Dado um produto de consulta q, o sistema recupera os Top-K títulos mais similares do índice. O valor de K é definido empiricamente durante a validação do módulo de recomendação.
+A coleção é persistida em disco (`artifacts/corpus/`) e reaberta pelo serviço.
+Implementação em `store.py` (`ZvecVectorStore`).

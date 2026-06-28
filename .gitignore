@@ -15,3 +15,8 @@ venv/
 # IDEs
 .vscode/
 .idea/
+
+# Recommender build artifacts (vector store, catalogs, embeddings)
+04_recommender/artifacts/
+04_recommender/artifacts_demo/
+.pytest_cache/
