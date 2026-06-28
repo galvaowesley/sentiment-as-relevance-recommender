@@ -332,9 +332,16 @@ button { cursor: pointer; font-family: inherit; }
 .pagination {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   padding: 16px 0 8px;
+}
+
+.pagination-summary {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-left: 8px;
 }
 
 .pagination button {
@@ -1008,7 +1015,17 @@ button { cursor: pointer; font-family: inherit; }
   }
   .sidebar-mobile-toggle:active { background: var(--accent-hover); }
 
-  .browse-main { padding: 16px 14px; }
+  /* leave room so the floating "Categorias" button never overlaps content */
+  .browse-main { padding: 16px 14px 88px; }
+
+  /* pagination: summary text drops to its own centered line, no overlap */
+  .pagination { gap: 6px; row-gap: 10px; }
+  .pagination-summary {
+    flex-basis: 100%;
+    margin-left: 0;
+    margin-top: 2px;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
