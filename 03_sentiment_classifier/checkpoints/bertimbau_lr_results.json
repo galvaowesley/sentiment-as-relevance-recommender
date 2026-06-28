@@ -1,0 +1,22 @@
+{
+  "model": "bertimbau_lr",
+  "bert_model": "neuralmind/bert-base-portuguese-cased",
+  "best_params": {
+    "C": 1.0,
+    "max_iter": 1000,
+    "solver": "saga"
+  },
+  "cv_f1_macro": 0.9568,
+  "val": {
+    "f1_macro": 0.9583,
+    "auc_roc": 0.9921
+  },
+  "test": {
+    "f1_macro": 0.9578,
+    "auc_roc": 0.9909
+  },
+  "embedding_dim": 768,
+  "train_size": 69634,
+  "val_size": 23212,
+  "test_size": 23212
+}
