@@ -266,9 +266,6 @@ export default function ProductDetail() {
 
         <div className="product-detail-layout">
 
-          {/* ── LEFT: product info + reviews ── */}
-          <div className="product-detail-left">
-
             {/* Product card */}
             <div className="product-info-card">
               <div className="product-info-top">
@@ -322,6 +319,11 @@ export default function ProductDetail() {
               )}
             </div>
 
+            {/* Recommendations — right after the product, before reviews */}
+            <div className="product-detail-right">
+              <RecommendationsPanel recommendations={recs} loading={loadingRecs} />
+            </div>
+
             {/* Reviews */}
             <div className="reviews-card">
               <h2>
@@ -366,12 +368,6 @@ export default function ProductDetail() {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* ── RIGHT: recommendations ── */}
-          <div className="product-detail-right">
-            <RecommendationsPanel recommendations={recs} loading={loadingRecs} />
-          </div>
 
         </div>
       </div>
