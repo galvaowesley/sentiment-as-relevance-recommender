@@ -281,3 +281,11 @@ def recommend(
         _enrich_product({**rec.metadata, "score": rec.score, "similarity": rec.similarity})
         for rec in recs
     ]
+
+
+# ── Static frontend ────────────────────────────────────────────────────────
+from fastapi.staticfiles import StaticFiles
+
+_FRONTEND_DIST = pathlib.Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if _FRONTEND_DIST.is_dir():
+    app.mount("/", StaticFiles(directory=str(_FRONTEND_DIST), html=True), name="static")
