@@ -418,8 +418,8 @@ button { cursor: pointer; font-family: inherit; }
   align-items: start;
 }
 
-.product-detail-layout > .product-info-card { grid-area: info; }
-.product-detail-layout > .reviews-card     { grid-area: reviews; }
+.product-detail-layout > .product-info-card { grid-area: info; min-width: 0; }
+.product-detail-layout > .reviews-card     { grid-area: reviews; min-width: 0; }
 
 .product-detail-right {
   grid-area: recs;
@@ -431,8 +431,12 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 @media (max-width: 900px) {
+  /* Nothing may force the viewport wider than the phone screen */
+  body { overflow-x: hidden; }
+
   .product-detail-layout {
-    grid-template-columns: 1fr;
+    /* minmax(0,1fr) — without the 0 min, a wide descendant blows the track out */
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "info"
       "recs"
@@ -440,12 +444,19 @@ button { cursor: pointer; font-family: inherit; }
     gap: 14px;
   }
   /* recommendations show right under the product, before the long review list */
-  .product-detail-right { position: static; }
+  .product-detail-right {
+    position: static;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .recs-panel,
+  .formula-card { min-width: 0; max-width: 100%; }
 
   /* mobile: recommendations become a horizontal snap carousel */
   .recs-list {
     max-height: none;
     display: flex;
+    width: 100%;
     overflow-x: auto;
     overflow-y: visible;
     scroll-snap-type: x mandatory;
@@ -454,8 +465,9 @@ button { cursor: pointer; font-family: inherit; }
   }
   .recs-list::-webkit-scrollbar { display: none; }
   .recs-list .rec-item {
-    flex: 0 0 82%;
-    max-width: 320px;
+    flex: 0 0 80%;
+    min-width: 0;
+    max-width: 300px;
     scroll-snap-align: start;
     border-bottom: none;
     border-right: 1px solid rgba(0,0,0,0.06);
@@ -507,6 +519,7 @@ button { cursor: pointer; font-family: inherit; }
   margin: 0 0 3px;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .product-info-brand {
@@ -1004,18 +1017,22 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ── Responsive: product grid columns ────────────────────── */
 @media (max-width: 640px) {
-  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .product-card { padding: 12px; border-radius: 12px; }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .product-card { padding: 12px; border-radius: 12px; min-width: 0; }
   .product-card-icon { height: 64px; padding: 8px; margin-bottom: 10px; }
-  .product-card-name { font-size: 13px; min-height: 34px; }
+  .product-card-name { font-size: 13px; min-height: 34px; overflow-wrap: anywhere; }
 
   /* Product detail: tighten paddings for small screens */
-  .product-detail-outer { padding: 14px; }
+  .product-detail-outer { padding: 14px; max-width: 100%; }
   .product-info-card { padding: 16px; }
   .product-info-top { gap: 12px; }
   .product-info-icon { width: 76px; height: 76px; padding: 10px; }
   .product-info-name { font-size: 18px; }
+  .product-info-stars { flex-wrap: wrap; }
+  .product-sentiment-badge { max-width: 100%; }
+  .product-sentiment-badge span { overflow-wrap: anywhere; }
   .reviews-card { padding: 16px; }
+  .reviews-scroll { max-height: 60vh; }
 }
 
 @media (max-width: 360px) {
