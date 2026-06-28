@@ -407,24 +407,22 @@ button { cursor: pointer; font-family: inherit; }
 
 .breadcrumb-current { color: var(--text); font-weight: 500; }
 
-/* ── Two-column layout ───────────────────────────────────── */
+/* ── Two-column layout (CSS grid: lets us reorder on mobile) ─ */
 .product-detail-layout {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 356px;
+  grid-template-areas:
+    "info    recs"
+    "reviews recs";
+  gap: 14px 20px;
+  align-items: start;
 }
 
-.product-detail-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+.product-detail-layout > .product-info-card { grid-area: info; }
+.product-detail-layout > .reviews-card     { grid-area: reviews; }
 
 .product-detail-right {
-  width: 356px;
-  flex-shrink: 0;
+  grid-area: recs;
   position: sticky;
   top: calc(var(--header-height) + var(--catnav-height) + 16px);
   display: flex;
@@ -433,8 +431,36 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 @media (max-width: 900px) {
-  .product-detail-layout { flex-direction: column; }
-  .product-detail-right { width: 100%; position: static; }
+  .product-detail-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "info"
+      "recs"
+      "reviews";
+    gap: 14px;
+  }
+  /* recommendations show right under the product, before the long review list */
+  .product-detail-right { position: static; }
+
+  /* mobile: recommendations become a horizontal snap carousel */
+  .recs-list {
+    max-height: none;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .recs-list::-webkit-scrollbar { display: none; }
+  .recs-list .rec-item {
+    flex: 0 0 82%;
+    max-width: 320px;
+    scroll-snap-align: start;
+    border-bottom: none;
+    border-right: 1px solid rgba(0,0,0,0.06);
+  }
+  .recs-list .rec-item:last-child { border-right: none; }
 }
 
 /* ── Product info card ───────────────────────────────────── */
@@ -560,6 +586,23 @@ button { cursor: pointer; font-family: inherit; }
   margin: 0 0 18px;
   letter-spacing: -0.01em;
 }
+
+/* Scroll container so a long review list doesn't feel like an endless page */
+.reviews-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #D1D5DB transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews-scroll::-webkit-scrollbar { width: 8px; }
+.reviews-scroll::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+.reviews-scroll::-webkit-scrollbar-track { background: transparent; }
 
 .review-item {
   padding: 16px 0;
@@ -886,3 +929,95 @@ button { cursor: pointer; font-family: inherit; }
 }
 .no-results p:first-child { font-size: 16px; font-weight: 600; color: #4A4A4A; margin-bottom: 6px; }
 .no-results p:last-child  { font-size: 14px; color: var(--text-soft); }
+
+/* ── Browse shell (class hooks for responsive layout) ─────── */
+.browse-page {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.browse-main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+}
+
+/* ── Mobile sidebar drawer (off-canvas) ──────────────────── */
+.sidebar-mobile-toggle { display: none; }
+.sidebar-backdrop { display: none; }
+
+/* ── Responsive: tablets and phones ──────────────────────── */
+@media (max-width: 768px) {
+  /* Header: drop the right-side subtitle, tighten spacing */
+  .header { padding: 0 14px; gap: 10px; }
+  .header-subtitle { display: none; }
+
+  /* Sidebar becomes an off-canvas drawer; products get full width */
+  .category-sidebar {
+    position: fixed;
+    top: var(--header-height);
+    bottom: 0;
+    left: 0;
+    z-index: 150;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 2px 0 18px rgba(0,0,0,0.14);
+  }
+  .category-sidebar.open { transform: translateX(0); }
+  /* hide the in-aside collapse hamburger on mobile */
+  .category-sidebar > button:first-of-type { display: none; }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: var(--header-height) 0 0 0;
+    background: rgba(0,0,0,0.38);
+    z-index: 149;
+  }
+
+  .sidebar-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    left: 14px;
+    bottom: 18px;
+    z-index: 148;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(139,92,246,0.42);
+  }
+  .sidebar-mobile-toggle:active { background: var(--accent-hover); }
+
+  .browse-main { padding: 16px 14px; }
+}
+
+@media (max-width: 480px) {
+  .header-brand { display: none; }
+}
+
+/* ── Responsive: product grid columns ────────────────────── */
+@media (max-width: 640px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .product-card { padding: 12px; border-radius: 12px; }
+  .product-card-icon { height: 64px; padding: 8px; margin-bottom: 10px; }
+  .product-card-name { font-size: 13px; min-height: 34px; }
+
+  /* Product detail: tighten paddings for small screens */
+  .product-detail-outer { padding: 14px; }
+  .product-info-card { padding: 16px; }
+  .product-info-top { gap: 12px; }
+  .product-info-icon { width: 76px; height: 76px; padding: 10px; }
+  .product-info-name { font-size: 18px; }
+  .reviews-card { padding: 16px; }
+}
+
+@media (max-width: 360px) {
+  .product-grid { grid-template-columns: 1fr; }
+}

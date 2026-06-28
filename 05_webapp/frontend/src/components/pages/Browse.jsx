@@ -5,7 +5,7 @@ import CategorySidebar from '../CategorySidebar.jsx'
 import ProductCard from '../ProductCard.jsx'
 import Pagination from '../Pagination.jsx'
 
-const PAGE_SIZE = 100
+const PAGE_SIZE = 24
 
 export default function Browse() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -51,10 +51,10 @@ export default function Browse() {
   const heading = cat2 ? cat2 : (category || (q ? `"${q}"` : 'Todos os produtos'))
 
   return (
-    <div className="page" style={{ paddingTop: 56, display: 'flex', alignItems: 'stretch', minHeight: '100vh' }}>
+    <div className="page browse-page">
       <CategorySidebar />
 
-      <div style={{ flex: 1, minWidth: 0, padding: '24px 24px' }}>
+      <div className="browse-main">
         <div className="browse-toolbar">
           <h2>{heading}</h2>
           {!loading && (

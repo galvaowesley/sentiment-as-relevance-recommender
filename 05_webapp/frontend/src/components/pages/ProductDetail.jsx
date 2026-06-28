@@ -358,9 +358,13 @@ export default function ProductDetail() {
                 </p>
               )}
 
-              {filteredReviews.map((r, i) => (
-                <ReviewItem key={i} review={r} />
-              ))}
+              {filteredReviews.length > 0 && (
+                <div className="reviews-scroll">
+                  {filteredReviews.map((r, i) => (
+                    <ReviewItem key={i} review={r} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
