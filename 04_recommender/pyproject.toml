@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+# 04_recommender is treated as a self-contained project root: putting "." on the
+# path makes the top-level modules (config, data, recommender, ...) importable.
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = '-q -m "not integration"'
+markers = [
+    "integration: loads the real Qwen3 embedding model (slow, downloads weights)",
+]

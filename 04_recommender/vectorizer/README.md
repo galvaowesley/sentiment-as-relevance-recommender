@@ -1,5 +1,14 @@
 # vectorizer — Embeddings de Títulos de Produtos
 
-Vetoriza os títulos de produto (`product_name`) usando o **Serafim PT*** (`serafim-335m-portuguese-pt-sentence-encoder`), sentence encoder aberto para português com 335M de parâmetros.
+Vetoriza os títulos de produto (`product_name`) com o **Qwen3-Embedding-0.6B**
+(`Qwen/Qwen3-Embedding-0.6B`), embedding multilíngue e instruction-aware.
 
-Cada título é codificado em um vetor denso de **1024 dimensões** via mean pooling, adequado para busca por similaridade de cosseno no banco vetorial. Os vetores gerados são persistidos para indexação em `../vector_store/`.
+Cada título vira um vetor denso de **1024 dimensões**, L2-normalizado (produto
+interno = cosseno), adequado à busca por similaridade no banco vetorial.
+
+- **Documentos** (corpus) são codificados sem instrução.
+- **Consultas** (produto da página) recebem o prefixo de instrução recomendado
+  para o Qwen3, seguindo o setup de retrieval assimétrico.
+
+O device é escolhido automaticamente (CUDA → MPS → CPU). Implementação em
+`embedder.py` (`Qwen3Embedder`).
