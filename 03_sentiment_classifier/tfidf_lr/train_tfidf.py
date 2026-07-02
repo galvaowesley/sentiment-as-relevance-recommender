@@ -10,14 +10,14 @@ Steps:
     6. Save vectorizer + model to 03_sentiment_classifier/checkpoints/
 
 Usage:
-    python 03_sentiment_classifier/tfidf_lr/train_tfidf.py
+    python 03_sentiment_classifier/tfidf_lr/train_tfidf.py --ngrams both
 """
 
+import argparse
 import json
 import sys
 import warnings
 from pathlib import Path
-
 import pickle
 
 import pandas as pd
@@ -63,13 +63,52 @@ def evaluate_split(model, X_tfidf, y_true) -> dict:
     print(f"  AUC-ROC  : {auc:.4f}")
     print("\n  Classification report:")
     print(classification_report(y_true, y_pred, target_names=["negative", "positive"]))
+    
+    report_dict = classification_report(y_true, y_pred, target_names=["negative", "positive"], output_dict=True)
+    
     print("  Confusion matrix (rows=true, cols=pred):")
     print(confusion_matrix(y_true, y_pred))
 
-    return {"f1_macro": round(f1, 4), "auc_roc": round(auc, 4)}
+    return {
+        "f1_macro": round(f1, 4),
+        "auc_roc": round(auc, 4),
+        "classes": {
+            "negative": {
+                "precision": round(report_dict["negative"]["precision"], 4),
+                "recall": round(report_dict["negative"]["recall"], 4),
+                "f1_score": round(report_dict["negative"]["f1-score"], 4),
+            },
+            "positive": {
+                "precision": round(report_dict["positive"]["precision"], 4),
+                "recall": round(report_dict["positive"]["recall"], 4),
+                "f1_score": round(report_dict["positive"]["f1-score"], 4),
+            }
+        }
+    }
 
 
 def main() -> None:
+    # ------------------------------------------------------------------
+    # 0. Argument Parser
+    # ------------------------------------------------------------------
+    parser = argparse.ArgumentParser(description="Train TF-IDF + Logistic Regression sentiment classifier.")
+    parser.add_argument(
+        "--ngrams",
+        type=str,
+        choices=["unigrams", "bigrams", "both"],
+        default="both",
+        help="Estratégia de extração: 'unigrams' (1,1), 'bigrams' (2,2) ou 'both' (1,2)."
+    )
+    args = parser.parse_args()
+
+    # Mapeamento do argumento do terminal para a tupla do Scikit-Learn
+    ngram_mapping = {
+        "unigrams": (1, 1),
+        "bigrams": (2, 2),
+        "both": (1, 2)
+    }
+    selected_ngram_range = ngram_mapping[args.ngrams]
+
     # ------------------------------------------------------------------
     # 1. Load data
     # ------------------------------------------------------------------
@@ -101,12 +140,15 @@ def main() -> None:
     # 3. TF-IDF vectorization
     # ------------------------------------------------------------------
     print("\n" + "=" * 60)
-    print("STEP 3 — TF-IDF vectorization (uni+bigrams, max 50k features)")
+    print(f"STEP 3 — TF-IDF vectorization ({args.ngrams}, max 50k features)")
     print("=" * 60)
-    vectorizer = build_vectorizer()
+    
+    # Passando dinamicamente a tupla selecionada
+    vectorizer = build_vectorizer(ngram_range=selected_ngram_range)
     X_train_tfidf = vectorizer.fit_transform(X_train)
     X_val_tfidf = vectorizer.transform(X_val)
     X_test_tfidf = vectorizer.transform(X_test)
+    
     print(f"  Vocabulary size : {len(vectorizer.vocabulary_):,}")
     print(f"  Train shape     : {X_train_tfidf.shape}")
     print(f"  Val shape       : {X_val_tfidf.shape}")
@@ -123,7 +165,8 @@ def main() -> None:
         "solver": ["lbfgs", "saga"],
         "max_iter": [1000],
     }
-    lr = LogisticRegression(class_weight="balanced", random_state=42)
+    unbalanced = {0: 2.5, 1: 1.0}
+    lr = LogisticRegression(class_weight=unbalanced, random_state=42)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     grid = GridSearchCV(
         lr,
@@ -163,13 +206,19 @@ def main() -> None:
     print("\n" + "=" * 60)
     print("STEP 6 — Saving artifacts")
     print("=" * 60)
-    with open(CHECKPOINT_DIR / "tfidf_vectorizer.pkl", "wb") as f:
+    
+    # Adicionando o tipo de n-grama ao nome dos arquivos para evitar sobrescrever
+    prefix = f"tfidf_{args.ngrams}"
+    
+    with open(CHECKPOINT_DIR / f"{prefix}_vectorizer.pkl", "wb") as f:
         pickle.dump(vectorizer, f)
-    with open(CHECKPOINT_DIR / "tfidf_lr_model.pkl", "wb") as f:
+    with open(CHECKPOINT_DIR / f"{prefix}_lr_model.pkl", "wb") as f:
         pickle.dump(best_model, f)
 
     results = {
-        "model": "tfidf_lr",
+        "model": f"tfidf_lr_{args.ngrams}",
+        "ngram_strategy": args.ngrams,
+        "ngram_range": selected_ngram_range,
         "best_params": grid.best_params_,
         "cv_f1_macro": round(grid.best_score_, 4),
         "val": val_metrics,
@@ -179,12 +228,13 @@ def main() -> None:
         "val_size": len(X_val_raw),
         "test_size": len(X_test_raw),
     }
-    results_path = CHECKPOINT_DIR / "tfidf_lr_results.json"
+    
+    results_path = CHECKPOINT_DIR / f"{prefix}_lr_results.json"
     results_path.write_text(json.dumps(results, indent=2, ensure_ascii=False))
 
-    print(f"  tfidf_vectorizer.pkl  → {CHECKPOINT_DIR}")
-    print(f"  tfidf_lr_model.pkl    → {CHECKPOINT_DIR}")
-    print(f"  tfidf_lr_results.json → {CHECKPOINT_DIR}")
+    print(f"  {prefix}_vectorizer.pkl  → {CHECKPOINT_DIR}")
+    print(f"  {prefix}_lr_model.pkl    → {CHECKPOINT_DIR}")
+    print(f"  {prefix}_lr_results.json → {CHECKPOINT_DIR}")
     print("\nDone.")
 
 
