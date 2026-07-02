@@ -88,9 +88,6 @@ def evaluate_split(model, X_tfidf, y_true) -> dict:
 
 
 def main() -> None:
-    # ------------------------------------------------------------------
-    # 0. Argument Parser
-    # ------------------------------------------------------------------
     parser = argparse.ArgumentParser(description="Train TF-IDF + Logistic Regression sentiment classifier.")
     parser.add_argument(
         "--ngrams",
@@ -101,7 +98,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Mapeamento do argumento do terminal para a tupla do Scikit-Learn
     ngram_mapping = {
         "unigrams": (1, 1),
         "bigrams": (2, 2),
@@ -109,9 +105,6 @@ def main() -> None:
     }
     selected_ngram_range = ngram_mapping[args.ngrams]
 
-    # ------------------------------------------------------------------
-    # 1. Load data
-    # ------------------------------------------------------------------
     print("=" * 60)
     print("STEP 1 — Loading data")
     print("=" * 60)
@@ -125,9 +118,6 @@ def main() -> None:
     dist = y_train.value_counts().sort_index()
     print(f"  Class dist (train): neg={dist[0]:,}  pos={dist[1]:,}")
 
-    # ------------------------------------------------------------------
-    # 2. Lemmatization
-    # ------------------------------------------------------------------
     print("\n" + "=" * 60)
     print("STEP 2 — Lemmatizing texts (spaCy pt_core_news_sm)")
     print("=" * 60)
@@ -136,9 +126,6 @@ def main() -> None:
     X_test = lemmatize_series(X_test_raw)
     print("  Done.")
 
-    # ------------------------------------------------------------------
-    # 3. TF-IDF vectorization
-    # ------------------------------------------------------------------
     print("\n" + "=" * 60)
     print(f"STEP 3 — TF-IDF vectorization ({args.ngrams}, max 50k features)")
     print("=" * 60)
@@ -154,9 +141,6 @@ def main() -> None:
     print(f"  Val shape       : {X_val_tfidf.shape}")
     print(f"  Test shape      : {X_test_tfidf.shape}")
 
-    # ------------------------------------------------------------------
-    # 4. Grid Search with k=5 stratified cross-validation (train only)
-    # ------------------------------------------------------------------
     print("\n" + "=" * 60)
     print("STEP 4 — Grid Search (k=5 StratifiedKFold, scoring=f1_macro)")
     print("=" * 60)
@@ -184,25 +168,19 @@ def main() -> None:
 
     best_model = grid.best_estimator_
 
-    # ------------------------------------------------------------------
-    # 5a. Evaluation on validation set
-    # ------------------------------------------------------------------
     print("\n" + "=" * 60)
     print("STEP 5a — Evaluation on validation set")
     print("=" * 60)
     val_metrics = evaluate_split(best_model, X_val_tfidf, y_val)
 
-    # ------------------------------------------------------------------
-    # 5b. Evaluation on held-out test set
-    # ------------------------------------------------------------------
+    
     print("\n" + "=" * 60)
     print("STEP 5b — Evaluation on held-out test set")
     print("=" * 60)
     test_metrics = evaluate_split(best_model, X_test_tfidf, y_test)
 
-    # ------------------------------------------------------------------
-    # 6. Save artifacts
-    # ------------------------------------------------------------------
+    # 6. Salvando
+
     print("\n" + "=" * 60)
     print("STEP 6 — Saving artifacts")
     print("=" * 60)
