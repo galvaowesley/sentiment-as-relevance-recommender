@@ -40,9 +40,12 @@ OUTPUT_DIR = ROOT / "03_sentiment_classifier" / "inference" / "outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_split(name: str) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+def load_split(name: str, neutral:str) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
     """Carrega o split, mapeia a polaridade e retorna o DataFrame original filtrado junto com X e y."""
-    path = DATA_DIR / f"B2W-Reviews01_no_neutral_{name}.csv"
+    if neutral == "":
+        path = DATA_DIR / f"B2W-Reviews01_{name}.csv"
+    else:
+        path = DATA_DIR / f"B2W-Reviews01_no_neutral_{name}.csv"
     df = pd.read_csv(path)
     X = build_text_input(df)
     y = map_polarity(df)
@@ -67,12 +70,19 @@ def main() -> None:
         default="both",
         help="Estratégia de extração utilizada no treinamento."
     )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        choices=["no_neutral", ""],
+        default="",
+        help="Dataset com ou sem neutros."
+    )
     args = parser.parse_args()
     prefix = f"tfidf_{args.ngrams}"
 
     print("Carregando datasets de validação e teste...")
-    df_val, X_val_raw, y_val = load_split("val")
-    df_test, X_test_raw, y_test = load_split("test")
+    df_val, X_val_raw, y_val = load_split("val", args.dataset)
+    df_test, X_test_raw, y_test = load_split("test", args.dataset)
 
     # Juntando validação e teste
     df_combined = pd.concat([df_val, df_test]).reset_index(drop=True)

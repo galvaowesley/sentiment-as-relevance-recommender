@@ -1,18 +1,18 @@
 {
-  "dataset_size": 46424,
+  "dataset_size": 46449,
   "ngram_strategy": "unigrams",
-  "f1_macro": 0.9388,
-  "auc_roc": 0.9859,
+  "f1_macro": 0.9564,
+  "auc_roc": 0.9917,
   "classes": {
     "negative": {
-      "precision": 0.888,
-      "recall": 0.9476,
-      "f1_score": 0.9168
+      "precision": 0.9122,
+      "recall": 0.9702,
+      "f1_score": 0.9403
     },
     "positive": {
-      "precision": 0.9758,
-      "recall": 0.9464,
-      "f1_score": 0.9609
+      "precision": 0.9865,
+      "recall": 0.9589,
+      "f1_score": 0.9725
     }
   }
 }
