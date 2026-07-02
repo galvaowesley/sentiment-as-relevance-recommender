@@ -115,21 +115,36 @@ def evaluate_split(model, X: np.ndarray, y: np.ndarray) -> dict:
     print(f"  AUC-ROC  : {auc:.4f}")
     print("\n  Classification report:")
     print(classification_report(y, y_pred, target_names=["negative", "positive"]))
+    
+    # Extrai as métricas detalhadas via dicionário
+    report_dict = classification_report(y, y_pred, target_names=["negative", "positive"], output_dict=True)
+    
     print("  Confusion matrix (rows=true, cols=pred):")
     print(confusion_matrix(y, y_pred))
 
-    return {"f1_macro": round(f1, 4), "auc_roc": round(auc, 4)}
+    # Retorna o dicionário com a mesma estrutura adotada no TF-IDF
+    return {
+        "f1_macro": round(f1, 4),
+        "auc_roc": round(auc, 4),
+        "classes": {
+            "negative": {
+                "precision": round(report_dict["negative"]["precision"], 4),
+                "recall": round(report_dict["negative"]["recall"], 4),
+                "f1_score": round(report_dict["negative"]["f1-score"], 4),
+            },
+            "positive": {
+                "precision": round(report_dict["positive"]["precision"], 4),
+                "recall": round(report_dict["positive"]["recall"], 4),
+                "f1_score": round(report_dict["positive"]["f1-score"], 4),
+            }
+        }
+    }
 
 
 def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # ------------------------------------------------------------------
-    # 1. Load data
-    # ------------------------------------------------------------------
-    print("=" * 60)
-    print("STEP 1 — Loading data")
-    print("=" * 60)
+    print("Loading data")
     X_train_raw, y_train = load_split("train")
     X_val_raw, y_val = load_split("val")
     X_test_raw, y_test = load_split("test")
@@ -139,12 +154,6 @@ def main() -> None:
     print(f"  Test  : {len(X_test_raw):,} samples")
     print(f"  Device: {device}")
 
-    # ------------------------------------------------------------------
-    # 2. Load BERTimbau (frozen)
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 2 — Loading BERTimbau (frozen weights)")
-    print("=" * 60)
     tokenizer = load_tokenizer()
     model = AutoModel.from_pretrained(MODEL_NAME).to(device)
     for param in model.parameters():
@@ -152,23 +161,11 @@ def main() -> None:
     print(f"  Model : {MODEL_NAME}")
     print(f"  Params: {sum(p.numel() for p in model.parameters()):,} (all frozen)")
 
-    # ------------------------------------------------------------------
-    # 3. Extract [CLS] embeddings
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 3 — Extracting [CLS] embeddings (batch_size={})".format(BATCH_SIZE))
-    print("=" * 60)
     X_train, _ = get_embeddings("train", X_train_raw, y_train, tokenizer, model, device)
     X_val, _ = get_embeddings("val", X_val_raw, y_val, tokenizer, model, device)
     X_test, _ = get_embeddings("test", X_test_raw, y_test, tokenizer, model, device)
     print(f"  Embedding dim: {X_train.shape[1]}")
 
-    # ------------------------------------------------------------------
-    # 4. Grid Search with k=3 stratified cross-validation (train only)
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 4 — Grid Search (k=3 StratifiedKFold, scoring=f1_macro)")
-    print("=" * 60)
     param_grid = {
         "C": [0.01, 0.1, 1.0, 10.0],
         "solver": ["lbfgs", "saga"],
@@ -192,28 +189,10 @@ def main() -> None:
 
     best_model = grid.best_estimator_
 
-    # ------------------------------------------------------------------
-    # 5a. Evaluation on validation set
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 5a — Evaluation on validation set")
-    print("=" * 60)
     val_metrics = evaluate_split(best_model, X_val, y_val.to_numpy())
 
-    # ------------------------------------------------------------------
-    # 5b. Evaluation on held-out test set
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 5b — Evaluation on held-out test set")
-    print("=" * 60)
     test_metrics = evaluate_split(best_model, X_test, y_test.to_numpy())
 
-    # ------------------------------------------------------------------
-    # 6. Save artifacts
-    # ------------------------------------------------------------------
-    print("\n" + "=" * 60)
-    print("STEP 6 — Saving artifacts")
-    print("=" * 60)
     with open(CHECKPOINT_DIR / "bertimbau_lr_model.pkl", "wb") as f:
         pickle.dump(best_model, f)
 
@@ -230,6 +209,8 @@ def main() -> None:
         "test_size": len(X_test_raw),
     }
     results_path = CHECKPOINT_DIR / "bertimbau_lr_results.json"
+    
+    # O JSON será gerado perfeitamente compatível com o formato exportado pelo script TF-IDF
     results_path.write_text(json.dumps(results, indent=2, ensure_ascii=False))
 
     print(f"  bertimbau_lr_model.pkl    → {CHECKPOINT_DIR}")
