@@ -1,0 +1,17 @@
+[project]
+name = "sentishop-backend"
+version = "0.1.0"
+description = "SentiShop FastAPI backend — wraps the 04_recommender ProductRecommender"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.138",
+    "uvicorn[standard]>=0.29",
+]
+
+[tool.uvicorn]
+# Run with: uvicorn app:app --app-dir . --port 8000
+# Or use run.sh which sets PYTHONPATH correctly.
+app = "app:app"
+host = "0.0.0.0"
+port = 8000
+reload = true
