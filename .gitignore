@@ -16,6 +16,9 @@ venv/
 .vscode/
 .idea/
 
+# checkpoints
+*.npy
+
 # Recommender build artifacts (vector store, catalogs, embeddings)
 04_recommender/artifacts_demo/
 .pytest_cache/

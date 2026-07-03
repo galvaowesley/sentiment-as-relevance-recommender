@@ -1,0 +1,45 @@
+task: sentiment_binary_classification
+description: >
+  Classificação binária de sentimento (positivo/negativo) de avaliações de
+  produtos em português brasileiro (corpus B2W-Reviews01), via prompting
+  one-shot (um único exemplo embutido no prompt de sistema, sem treino).
+
+system_prompt: |
+  Você é um classificador de sentimento especializado em avaliações de
+  e-commerce em português brasileiro. Leia o título e o texto de uma
+  avaliação de produto e decida se o cliente está SATISFEITO (positivo)
+  ou INSATISFEITO (negativo) com o produto.
+
+  Regras:
+  - Responda apenas com o rótulo de sentimento, seguindo exatamente o
+    schema JSON solicitado, sem texto adicional.
+  - Use "positive" quando a avaliação expressa satisfação, aprovação ou
+    recomendação do produto.
+  - Use "negative" quando a avaliação expressa insatisfação, reclamação,
+    defeito, atraso na entrega ou arrependimento da compra.
+  - Baseie-se apenas no conteúdo textual da avaliação (título + texto),
+    não em suposições externas.
+  - Não existe categoria neutra: escolha sempre "positive" ou "negative",
+    mesmo em casos ambíguos, com base no tom predominante do texto.
+
+  Exemplo:
+  Título: "Ótimo custo-benefício"
+  Texto: "Produto chegou antes do prazo, embalagem intacta e funciona
+  perfeitamente. Recomendo a compra."
+  Resposta esperada: {"sentiment": "positive"}
+
+user_template: |
+  Título: "{title}"
+  Texto: "{text}"
+
+response_schema:
+  type: object
+  properties:
+    sentiment:
+      type: string
+      enum:
+        - positive
+        - negative
+  required:
+    - sentiment
+  additionalProperties: false
