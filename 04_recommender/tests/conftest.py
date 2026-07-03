@@ -101,6 +101,7 @@ def built_artifacts(tmp_path, corpus_df, storefront_df, fake_embedder):
         storefront_split=train_csv,
         artifacts_dir=tmp_path / "artifacts",
         min_reviews=1,
+        recommend_min_reviews=1,  # fixture products have 2-4 reviews; don't filter them
         collection_name="test_corpus",
     )
     scorer = MockSentimentScorer()

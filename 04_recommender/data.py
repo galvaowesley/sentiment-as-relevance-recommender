@@ -55,7 +55,9 @@ def load_reviews(paths: Iterable[str | Path]) -> pd.DataFrame:
         path = Path(path)
         if not path.exists():
             raise FileNotFoundError(f"Review split not found: {path}")
-        frames.append(pd.read_csv(path))
+        # product_id is read as str (it is numeric in some rows, quoted in others);
+        # this avoids a mixed-type DtypeWarning and keeps ids joinable downstream.
+        frames.append(pd.read_csv(path, dtype={"product_id": str}))
     if not frames:
         raise ValueError("No review splits provided")
 
@@ -110,6 +112,30 @@ def build_catalog(
     if limit is not None:
         records = records[:limit]
     return records
+
+
+def compute_sentiment_scores(
+    df: pd.DataFrame,
+    label_column: str = "inferencia_bertimbau",
+    positive_label: int = 1,
+) -> pd.DataFrame:
+    """Aggregate per-product S(p) from per-review predicted labels.
+
+    Returns one row per ``product_id`` with ``num_reviews``, ``num_positive`` and
+    ``sentiment_score = num_positive / num_reviews``. This is the standalone Pipeline 1
+    artifact; ``build_catalog`` computes the same ``sentiment_score`` inline via a
+    :class:`~reranking.sentiment.PredictedLabelSentimentScorer`.
+    """
+    if label_column not in df.columns:
+        raise ValueError(f"Missing predicted-label column: {label_column}")
+
+    labels = pd.to_numeric(df[label_column], errors="coerce")
+    working = df[["product_id"]].copy()
+    working["_positive"] = (labels == positive_label).astype("int64")
+    grouped = working.groupby("product_id", sort=False)["_positive"]
+    scores = grouped.agg(num_reviews="size", num_positive="sum").reset_index()
+    scores["sentiment_score"] = scores["num_positive"] / scores["num_reviews"]
+    return scores
 
 
 def catalog_to_frame(records: list[ProductRecord]) -> pd.DataFrame:

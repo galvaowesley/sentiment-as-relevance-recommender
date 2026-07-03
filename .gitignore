@@ -7,7 +7,7 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-.env
+# NOTE: .env IS versioned on purpose — it holds only paths/params, never secrets.
 
 # Jupyter
 .ipynb_checkpoints/

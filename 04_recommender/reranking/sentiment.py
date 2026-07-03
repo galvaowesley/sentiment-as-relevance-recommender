@@ -1,11 +1,13 @@
 """Per-product sentiment score S(p).
 
 ``S(p)`` is the proportion of *positive* reviews of a product and is the second
-term of the final re-ranking score. The real value will come from the Pipeline 1
-sentiment classifier; until that model is ready we use a rating-based placeholder.
+term of the final re-ranking score. In production it comes from the Pipeline 1
+classifier's per-review predictions via :class:`PredictedLabelSentimentScorer`; a
+rating-based :class:`MockSentimentScorer` is kept for tests and for the storefront
+split, which has no classifier inference.
 
-Any scorer just needs to implement the :class:`SentimentScorer` protocol, so the
-real classifier can be dropped in without touching the rest of the engine.
+Any scorer just needs to implement the :class:`SentimentScorer` protocol, so a
+different classifier can be dropped in without touching the rest of the engine.
 """
 
 from __future__ import annotations
@@ -41,3 +43,31 @@ class MockSentimentScorer:
         if ratings.empty:
             return 0.0
         return float((ratings >= self.positive_threshold).mean())
+
+
+class PredictedLabelSentimentScorer:
+    """Real S(p) from the Pipeline 1 classifier's per-review predictions.
+
+    ``S(p)`` is the fraction of a product's reviews whose predicted label equals
+    ``positive_label``. It reads the hard label column produced during inference
+    (e.g. ``inferencia_bertimbau`` with ``1`` = positive), so the score is the
+    literal "proportion of positive reviews" from the README/report spec.
+
+    The column is configurable because each classifier writes its own label column
+    (``inferencia_tfidf`` for the TF-IDF models, ``llm_predicted_polarity`` for the
+    LLMs), letting the same scorer serve any of them.
+    """
+
+    def __init__(
+        self,
+        label_column: str = "inferencia_bertimbau",
+        positive_label: int = 1,
+    ) -> None:
+        self.label_column = label_column
+        self.positive_label = positive_label
+
+    def score_product(self, reviews: pd.DataFrame) -> float:
+        labels = pd.to_numeric(reviews[self.label_column], errors="coerce").dropna()
+        if labels.empty:
+            return 0.0
+        return float((labels == self.positive_label).mean())

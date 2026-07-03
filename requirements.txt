@@ -1,5 +1,7 @@
 numpy==2.2.3
 pandas==2.2.3
+# Parquet backend for pandas (sentiment_scores.parquet).
+pyarrow==19.0.1
 scikit-learn==1.6.1
 torch==2.6.0
 # Qwen3-Embedding requires transformers >= 4.51; pinned to the version in the env.

@@ -26,15 +26,27 @@ S(p)           = |avaliações positivas de p| / |total de avaliações de p|
 Score_final(p) = α · sim(q, p) + (1 − α) · S(p)
 ```
 
-`S(p)` é **mockado** (proporção de avaliações com `overall_rating ≥ 4`) até o
-classificador de sentimento do Pipeline 1 ficar pronto — o classificador real
-implementa o mesmo protocolo `SentimentScorer` e entra sem alterar o resto do motor.
+`S(p)` vem da inferência do **Pipeline 1** (BERTimbau): é a proporção de avaliações do
+produto classificadas como positivas (`inferencia_bertimbau == 1`), via
+`PredictedLabelSentimentScorer` (protocolo `SentimentScorer`). O **mesmo** score real é
+usado no corpus e na vitrine.
 
 ## Dados
 
-- **Corpus** (produtos recomendáveis): `no_neutral` **val + test**.
-- **Storefront** (páginas navegáveis que geram as consultas): split **train** (com neutros).
+Corpus e vitrine vêm da **mesma fonte** — o CSV inferido do BERTimbau (`val + test`),
+`data/results_from_best_model/B2W-Reviews01_inferred_bertimbau.csv` — para máxima
+coerência (não há dados de treino envolvidos).
+
+- **Corpus** (produtos recomendáveis) e **storefront** (páginas navegáveis que geram as
+  consultas) contêm os mesmos produtos, com o mesmo `S(p)` real. Diferem apenas na
+  codificação do embedding: corpus como *documento*, vitrine como *query* (setup
+  assimétrico do Qwen3).
+- **Todos os produtos são vetorizados** (`min_reviews = 1`).
+- **Recomendação**: só produtos com `num_reviews ≥ recommend_min_reviews` (**5**) são
+  recomendados. Esse corte é feito **em query-time** (filtro no índice + guarda em Python),
+  à parte da vetorização — o índice mantém o catálogo completo.
 - Produtos são deduplicados por `product_id`; recomendações excluem o próprio produto.
+- `build_index.py` também grava `data/processed/sentiment_scores.parquet` (S(p) por produto).
 
 ## Uso
 
@@ -43,7 +55,7 @@ Sempre a partir desta pasta, com o ambiente mamba `nlp_project`:
 ```bash
 cd 04_recommender
 
-# 1. Construir os artefatos (corpus de val+test, storefront de train)
+# 1. Construir os artefatos (corpus + storefront, ambos do CSV inferido val+test)
 mamba run -n nlp_project python build_index.py            # build completo
 mamba run -n nlp_project python build_index.py --limit 2000   # build rápido
 
@@ -58,8 +70,12 @@ mamba run -n nlp_project uvicorn service.app:app --app-dir . --port 8000
 ```
 
 Configuração central em `config.py` (modelo, `α`, `top_n`, `min_reviews`, device…).
-O device é auto-detectado (CUDA → MPS → CPU) e pode ser forçado via
-`RECOMMENDER_DEVICE`, tornando o código portável entre máquinas.
+Os paths e parâmetros mais importantes ficam no **`.env` da raiz** (versionado — só
+caminhos, nunca segredos), lido por `RecommenderConfig.from_env()`; entre eles
+`RECOMMENDER_INFERRED_CSV` (fonte única de corpus e vitrine) e `RECOMMENDER_ARTIFACTS`.
+Variáveis já definidas no ambiente têm precedência sobre o `.env`. O device é
+auto-detectado (CUDA → MPS → CPU) e pode ser forçado via `RECOMMENDER_DEVICE`,
+tornando o código portável entre máquinas.
 
 ## Testes
 

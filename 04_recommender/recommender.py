@@ -6,8 +6,9 @@ Loads the artifacts produced by ``build_index.py`` and exposes a small API:
 * :meth:`ProductRecommender.list_storefront` / :meth:`get_storefront_product` —
   browse the simulated retail catalog (the pages that issue queries)
 
-Recommendations are drawn from the **corpus** (no-neutral val + test) while the
-**storefront** (train) supplies the browsable product pages.
+Recommendations are drawn from the **corpus** while the **storefront** supplies the
+browsable product pages. Both come from the same BERTimbau-inferred val+test source
+(same products and S(p)); they differ only in embedding encoding (document vs query).
 """
 
 from __future__ import annotations
@@ -130,17 +131,26 @@ class ProductRecommender:
         top_n = self.config.top_n if top_n is None else top_n
 
         query_vec, exclude_id = self._resolve_query(product_id, query_text)
-        hits = self.store.query(query_vec, topk=self.config.retrieve_k)
+        # Every product is indexed, but only well-reviewed ones are recommendable.
+        # Push the cut into the ANN so the retrieved candidates already qualify;
+        # the Python guard below is a backstop if the backend ignores the filter.
+        min_reviews = self.config.recommend_min_reviews
+        review_filter = f"num_reviews >= {min_reviews}" if min_reviews > 1 else None
+        hits = self.store.query(
+            query_vec, topk=self.config.retrieve_k, filter=review_filter
+        )
 
         candidates: list[Candidate] = []
         for pid, _retrieval_sim in hits:
             pos = self._corpus_pos.get(pid)
             if pos is None:
                 continue
+            row = self.corpus_catalog.iloc[pos]
+            if int(row["num_reviews"]) < min_reviews:
+                continue
             # Recompute exact cosine sim from stored normalised embeddings so the
             # final score is independent of the ANN backend's scoring convention.
             sim = float(np.dot(self.corpus_embeddings[pos], query_vec))
-            row = self.corpus_catalog.iloc[pos]
             candidates.append(
                 Candidate(
                     product_id=pid,

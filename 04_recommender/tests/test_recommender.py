@@ -74,6 +74,19 @@ def test_unknown_product_raises(built_artifacts):
         raise AssertionError("expected KeyError for unknown product_id")
 
 
+def test_filters_products_below_min_reviews(built_artifacts):
+    # C2 has only 2 reviews; with a threshold of 3 it must never be recommended,
+    # even though it is indexed. C1 (3) and C3 (4) remain recommendable.
+    config, embedder = built_artifacts
+    config.recommend_min_reviews = 3
+    rec = ProductRecommender.load(config, embedder=embedder)
+
+    results = rec.recommend(product_id="S2", top_n=10)
+    ids = {r.product_id for r in results}
+    assert "C2" not in ids
+    assert ids == {"C1", "C3"}
+
+
 def test_storefront_browsing(built_artifacts):
     rec = _load(built_artifacts)
     products = rec.list_storefront(limit=10)
