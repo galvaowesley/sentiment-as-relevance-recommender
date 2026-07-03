@@ -50,15 +50,7 @@ def load_split(name: str, neutral:str) -> tuple[pd.DataFrame, pd.Series, pd.Seri
     X = build_text_input(df)
     y = map_polarity(df)
     
-    # Criar máscara para remover nulos
-    mask = y.notna()
-    
-    # Retorna o DF original filtrado, além de X e y
-    df_filtered = df[mask].reset_index(drop=True)
-    X_filtered = X[mask].reset_index(drop=True)
-    y_filtered = y[mask].astype(int).reset_index(drop=True)
-    
-    return df_filtered, X_filtered, y_filtered
+    return df, X, y
 
 
 def main() -> None:
@@ -104,55 +96,22 @@ def main() -> None:
         vectorizer = pickle.load(f)
     with open(lr_model_path, "rb") as f:
         lr_model = pickle.load(f)
-    
     X_embeddings = vectorizer.transform(X_combined_lemmatized)
     print(f"  Shape final: {X_embeddings.shape}\n")
 
     y_pred = lr_model.predict(X_embeddings)
     y_proba = lr_model.predict_proba(X_embeddings)[:, 1]
-
-    f1 = f1_score(y_combined, y_pred, average="macro")
-    auc = roc_auc_score(y_combined, y_proba)
-    report_dict = classification_report(y_combined, y_pred, target_names=["negative", "positive"], output_dict=True)
-
-    print(f"  F1-macro : {f1:.4f}")
-    print(f"  AUC-ROC  : {auc:.4f}")
-
     
-    # Adicionando atributos à cópia do dataset original
+    # Adicionando atributos à cópia do dataset original (CONTÉM AS NOTAS 3)
     df_combined["inferencia_tfidf"] = y_pred
     df_combined["probabilidade_tfidf"] = np.round(y_proba, 4)
     
     # Exportando dataset
     csv_path = OUTPUT_DIR / f"B2W-Reviews01_inferred_{prefix}.csv"
     df_combined.to_csv(csv_path, index=False)
-    
-    # Exportando métricas
-    metrics = {
-        "dataset_size": len(df_combined),
-        "ngram_strategy": args.ngrams,
-        "f1_macro": round(f1, 4),
-        "auc_roc": round(auc, 4),
-        "classes": {
-            "negative": {
-                "precision": round(report_dict["negative"]["precision"], 4),
-                "recall": round(report_dict["negative"]["recall"], 4),
-                "f1_score": round(report_dict["negative"]["f1-score"], 4),
-            },
-            "positive": {
-                "precision": round(report_dict["positive"]["precision"], 4),
-                "recall": round(report_dict["positive"]["recall"], 4),
-                "f1_score": round(report_dict["positive"]["f1-score"], 4),
-            }
-        }
-    }
-    json_path = OUTPUT_DIR / f"metrics_inferred_{prefix}.json"
-    json_path.write_text(json.dumps(metrics, indent=2, ensure_ascii=False))
 
     print(f"  Dataset salvo em: {csv_path}")
-    print(f"  Métricas salvas em: {json_path}")
     print("\nConcluído.")
-
 
 if __name__ == "__main__":
     main()
