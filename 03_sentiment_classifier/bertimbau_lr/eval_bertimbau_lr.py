@@ -40,22 +40,18 @@ OUTPUT_DIR = ROOT / "03_sentiment_classifier" / "inference" / "outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_split(name: str) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+def load_split(name: str, neutral) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
     """Carrega o split, aplica preprocessamento e retorna o DataFrame original filtrado junto com X e y."""
-    path = DATA_DIR / f"B2W-Reviews01_no_neutral_{name}.csv"
+    if neutral == "":
+        path = DATA_DIR / f"B2W-Reviews01_{name}.csv"
+    else:
+        path = DATA_DIR / f"B2W-Reviews01_no_neutral_{name}.csv"
+    print(path)
     df = pd.read_csv(path)
     X = build_text_input_bert(df)
     y = map_polarity(df)
     
-    # Criar máscara para remover nulos
-    mask = y.notna()
-    
-    # Retornamos o DF original filtrado, além de X e y
-    df_filtered = df[mask].reset_index(drop=True)
-    X_filtered = X[mask].reset_index(drop=True)
-    y_filtered = y[mask].astype(int).reset_index(drop=True)
-    
-    return df_filtered, X_filtered, y_filtered
+    return df, X, y
 
 
 def extract_cls_embeddings(
@@ -66,7 +62,7 @@ def extract_cls_embeddings(
     device: torch.device,
 ) -> np.ndarray:
     """Extrai os embeddings [CLS] do BERT em batches."""
-    dataset = ReviewDataset(texts, tokenizer, labels=labels)
+    dataset = ReviewDataset(texts, tokenizer)
     loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     embeddings = []
@@ -87,11 +83,22 @@ def extract_cls_embeddings(
 
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description="Run inference for Bertimbau + Logistic Regression.")
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        choices=["no_neutral", ""],
+        default="",
+        help="Dataset com ou sem neutros."
+    )
+    args = parser.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     print(f"Dispositivo de inferência: {device}\n")
 
-    df_val, X_val, y_val = load_split("val")
-    df_test, X_test, y_test = load_split("test")
+    df_val, X_val, y_val = load_split("val", args.dataset)
+    df_test, X_test, y_test = load_split("test", args.dataset)
 
     # Juntando validação e teste
     df_combined = pd.concat([df_val, df_test]).reset_index(drop=True)
@@ -115,13 +122,6 @@ def main() -> None:
     y_pred = lr_model.predict(X_embeddings)
     y_proba = lr_model.predict_proba(X_embeddings)[:, 1]
 
-    f1 = f1_score(y_combined, y_pred, average="macro")
-    auc = roc_auc_score(y_combined, y_proba)
-    report_dict = classification_report(y_combined, y_pred, target_names=["negative", "positive"], output_dict=True)
-
-    print(f"  F1-macro : {f1:.4f}")
-    print(f"  AUC-ROC  : {auc:.4f}")
-
     # Criando os novos atributos diretamente na cópia do dataset original
     df_combined["inferencia_bertimbau"] = y_pred
     df_combined["probabilidade_bertimbau"] = np.round(y_proba, 4)
@@ -130,29 +130,7 @@ def main() -> None:
     csv_path = OUTPUT_DIR / "B2W-Reviews01_inferred_bertimbau.csv"
     df_combined.to_csv(csv_path, index=False)
     
-    # Exportando métricas
-    metrics = {
-        "dataset_size": len(df_combined),
-        "f1_macro": round(f1, 4),
-        "auc_roc": round(auc, 4),
-        "classes": {
-            "negative": {
-                "precision": round(report_dict["negative"]["precision"], 4),
-                "recall": round(report_dict["negative"]["recall"], 4),
-                "f1_score": round(report_dict["negative"]["f1-score"], 4),
-            },
-            "positive": {
-                "precision": round(report_dict["positive"]["precision"], 4),
-                "recall": round(report_dict["positive"]["recall"], 4),
-                "f1_score": round(report_dict["positive"]["f1-score"], 4),
-            }
-        }
-    }
-    json_path = OUTPUT_DIR / "metrics_inferred_bertimbau.json"
-    json_path.write_text(json.dumps(metrics, indent=2, ensure_ascii=False))
-
     print(f"  Dataset salvo em: {csv_path}")
-    print(f"  Métricas salvas em: {json_path}")
     print("\nConcluído.")
 
 
