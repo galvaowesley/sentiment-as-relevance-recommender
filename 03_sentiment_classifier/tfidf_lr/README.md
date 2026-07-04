@@ -6,9 +6,12 @@ Modelo de linha de base com representação esparsa. Usa a matriz TF-IDF produzi
 
 | Arquivo | Descrição |
 |---|---|
-| `train_tfidf.py` | Script completo de treino, validação cruzada, avaliação e salvamento de artefatos |
+| `train_tfidf.py` | Treino, validação cruzada, avaliação e salvamento de artefatos (`--ngrams unigrams\|bigrams\|both`) |
+| `eval_tfidf.py` | Inferência do modelo treinado → CSV enriquecido (`--ngrams …`, `--dataset ""\|no_neutral`) |
+| `all_ngrams.sh` | Treina as três variantes de n-grama (rodar de dentro desta pasta) |
+| `all_ngrams_eval.sh` | Roda a inferência para as três variantes (rodar de dentro desta pasta) |
 
-## Pipeline
+## Pipeline (treino)
 
 1. Carrega os splits sem neutros (`data/processed/B2W-Reviews01_no_neutral_*.csv`)
 2. Normalização textual comum via `02_preprocessing/common/preprocess.py`
@@ -17,10 +20,6 @@ Modelo de linha de base com representação esparsa. Usa a matriz TF-IDF produzi
 5. Avaliação independente no val e no test (F1-macro, AUC-ROC, Precisão, Revocação, Matriz de Confusão)
 6. Salva artefatos em `03_sentiment_classifier/checkpoints/`
 
-## Validação
-
-O Grid Search com k=5 folds roda somente sobre o conjunto de treino. Val e test são mantidos separados e avaliados de forma independente como dois conjuntos de teste distintos, permitindo comparar a generalização do modelo entre os dois splits.
-
 ## Hiperparâmetros buscados
 
 | Parâmetro | Valores |
@@ -28,18 +27,25 @@ O Grid Search com k=5 folds roda somente sobre o conjunto de treino. Val e test 
 | `C` | 0.01, 0.1, 1.0, 10.0 |
 | `solver` | lbfgs, saga |
 | `max_iter` | 1000 |
-| `class_weight` | balanced (fixo) |
+| `class_weight` | `{0: 2.5, 1: 1.0}` (fixo — favorece a classe negativa) |
 
-## Artefatos gerados
+## Artefatos gerados (`checkpoints/`, por variante de n-grama)
 
 | Arquivo | Descrição |
 |---|---|
-| `checkpoints/tfidf_vectorizer.pkl` | Vetorizador TF-IDF ajustado ao train+val |
-| `checkpoints/tfidf_lr_model.pkl` | Melhor modelo de Regressão Logística |
-| `checkpoints/tfidf_lr_results.json` | Métricas de avaliação no teste |
+| `tfidf_{ngrams}_vectorizer.pkl` | Vetorizador TF-IDF ajustado |
+| `tfidf_{ngrams}_lr_model.pkl` | Melhor modelo de Regressão Logística |
+| `tfidf_{ngrams}_lr_results.json` | Métricas no val e no test (coletânea curada em `../train_evaluation/`) |
+| `../inference/outputs/B2W-Reviews01_inferred_tfidf_{ngrams}.csv` | CSV enriquecido (gerado por `eval_tfidf.py`) |
 
 ## Execução
 
 ```bash
-python 03_sentiment_classifier/tfidf_lr/train_tfidf.py
+# via Makefile na raiz
+make train-tfidf NGRAMS=both
+make infer-tfidf NGRAMS=both
+
+# ou manualmente
+python 03_sentiment_classifier/tfidf_lr/train_tfidf.py --ngrams both
+python 03_sentiment_classifier/tfidf_lr/eval_tfidf.py --ngrams both --dataset ""
 ```

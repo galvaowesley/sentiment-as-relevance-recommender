@@ -1,13 +1,14 @@
 # data — Dados do Projeto
 
-Armazena o corpus original, os datasets derivados e amostras para testes.
+Armazena o corpus original, os datasets derivados, as inferências do modelo campeão e amostras para testes.
 
 ## Conteúdo
 
 | Pasta | Descrição |
 |---|---|
 | `raw/` | Corpus B2W-Reviews01 original (não versionado no git) |
-| `processed/` | Splits e datasets com polaridade mapeada e scores de sentimento |
-| `samples/` | Amostras pequenas para testes rápidos de pipeline |
+| `processed/` | Splits treino/val/teste (`.csv`) e `sentiment_scores.parquet` |
+| `results_from_best_model/` | CSV inferido pelo modelo campeão (BERTimbau), consumido pelo recomendador |
+| `samples/` | Amostras pequenas para testes rápidos (planejado) |
 
-> Arquivos grandes (`.csv` > 50MB) estão listados no `.gitignore`. Consulte `raw/README.md` para instruções de download.
+> O corpus bruto e os embeddings (`.npy`) estão listados no `.gitignore`. Consulte `raw/README.md` para instruções de download.

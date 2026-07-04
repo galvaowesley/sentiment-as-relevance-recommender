@@ -2,7 +2,4 @@
 
 Slides dos seminários da disciplina.
 
-| Arquivo | Descrição |
-|---|---|
-| `seminario_1.pptx` | Apresentação do Seminário 1 (proposta e EDA parcial) |
-| `seminario_2.pptx` | Apresentação do Seminário 2 (resultados finais) |
+> **Status: planejado — ainda sem arquivos.** Adicione aqui as apresentações dos seminários (proposta/EDA e resultados finais) quando disponíveis.

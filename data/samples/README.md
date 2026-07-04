@@ -2,10 +2,4 @@
 
 Subconjuntos pequenos do corpus para validar pipelines rapidamente sem carregar os ~130k registros completos.
 
-## Arquivos disponíveis
-
-| Arquivo | Descrição |
-|---|---|
-| `B2W-Reviews01_sample_10.xlsx` | 10 instâncias representativas do corpus |
-
-Adicione amostras maiores conforme necessário (ex.: 100, 1000 registros estratificados).
+> **Status: planejado — ainda sem arquivos.** Adicione aqui amostras estratificadas (ex.: 10, 100, 1000 registros) conforme necessário. Para amostras qualitativas de inferência, veja `03_sentiment_classifier/sample_data.py`.

@@ -1,14 +1,13 @@
 # processed — Dados Processados
 
-Datasets derivados do corpus original gerados pelos scripts de `02_preprocessing/`.
+Datasets derivados do corpus original, gerados pelos scripts de `02_preprocessing/` (`make splits`).
 
-## Arquivos esperados
+## Arquivos
 
 | Arquivo | Descrição |
 |---|---|
-| `train.parquet` | 70% do corpus com polaridade mapeada (estratificado) |
-| `val.parquet` | 15% para ajuste de hiperparâmetros |
-| `test.parquet` | 15% para avaliação final (não tocar até o fim) |
-| `sentiment_scores.parquet` | Score S(p) por produto, gerado por `04_recommender/build_index.py` a partir da inferência do BERTimbau. Colunas: `product_id, num_reviews, num_positive, sentiment_score` (`sentiment_score = num_positive / num_reviews`). |
+| `B2W-Reviews01_{train,val,test}.csv` | Splits com polaridade mapeada, **mantendo** avaliações neutras (usados na inferência) |
+| `B2W-Reviews01_no_neutral_{train,val,test}.csv` | Splits **sem** neutros (usados no treino dos modelos) |
+| `sentiment_scores.parquet` | Score `S(p)` por produto, gerado por `04_recommender/build_index.py`. Colunas: `product_id, num_reviews, num_positive, sentiment_score` (`sentiment_score = num_positive / num_reviews`) |
 
-> Mapeamento de polaridade: notas 1–2 → negativo, 4–5 → positivo, nota 3 → descartada.
+> Mapeamento de polaridade: notas 1–2 → negativo, 4–5 → positivo, nota 3 → descartada (nos splits `no_neutral`). Proporção padrão dos splits: 60/20/20 estratificado.

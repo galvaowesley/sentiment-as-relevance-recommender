@@ -1,7 +1,5 @@
-# bertimbau_ft — BERTimbau Fine-tuning + MLP
+# bertimbau_ft — BERTimbau Fine-tuning + MLP (planejado)
 
-BERTimbau Base com **fine-tuning completo**: uma camada linear é adicionada ao [CLS] e toda a rede é ajustada ponta-a-ponta na tarefa de classificação binária de sentimento.
+> **Status: planejado — ainda sem código.** Esta pasta contém apenas este README. O modelo campeão atualmente em uso é o `bertimbau_lr/` ([CLS] congelado + Regressão Logística).
 
-Configuração esperada como modelo campeão segundo a literatura (AUC-ROC > 0.95 em benchmarks de PT-BR). Os pesos finais são salvos em `../checkpoints/`.
-
-**Validação:** k=3 folds.
+Configuração prevista: BERTimbau Base com **fine-tuning completo** — uma cabeça linear/MLP sobre o `[CLS]` e toda a rede ajustada ponta-a-ponta na classificação binária de sentimento, com validação k=3. Esperado, segundo a literatura de PT-BR, como o modelo de maior desempenho (AUC-ROC > 0.95 em benchmarks). Quando implementado, os pesos finais devem ser salvos em `../checkpoints/`.
