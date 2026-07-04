@@ -4,6 +4,9 @@ import { getProduct, getProductReviews, getRecommendations } from '../../api.js'
 import CategoryIcon from '../CategoryIcon.jsx'
 import RecommendationsPanel from '../RecommendationsPanel.jsx'
 
+// Default re-ranking weight — mirrors RecommenderConfig.alpha in the backend.
+const DEFAULT_ALPHA = 0.7
+
 // ── Helpers ────────────────────────────────────────────────
 function Stars({ rating, size = 'sm' }) {
   const n = Math.round(rating ?? 0)
@@ -24,24 +27,30 @@ function formatDate(raw) {
   return raw.slice(0, 10)
 }
 
-function SentimentPill({ score }) {
-  if (score === null || score === undefined) {
+// Per-review sentiment as predicted by the BERTimbau classifier (positivo/negativo),
+// with the model's confidence in that label.
+function SentimentPill({ label, confidence }) {
+  if (label !== 'positive' && label !== 'negative') {
     return (
-      <span className="review-sentiment-badge pending" title="Sentimento a ser calculado pelo pipeline de classificação">
+      <span className="review-sentiment-badge pending" title="Sem predição de sentimento para esta avaliação">
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
           <circle cx="5" cy="5" r="4.5" stroke="#9B9B9B" strokeWidth="1"/>
           <line x1="5" y1="2.5" x2="5" y2="5.5" stroke="#9B9B9B" strokeWidth="1.2" strokeLinecap="round"/>
           <circle cx="5" cy="7" r="0.6" fill="#9B9B9B"/>
         </svg>
-        S(p) pendente
+        sem predição
       </span>
     )
   }
-  const pct = Math.round(score * 100)
-  const cls = pct >= 50 ? 'positive' : 'negative'
+  const isPos = label === 'positive'
+  const pct = confidence != null ? Math.round(confidence * 100) : null
   return (
-    <span className={`review-sentiment-badge ${cls}`}>
-      S(p) {pct}%
+    <span
+      className={`review-sentiment-badge ${isPos ? 'positive' : 'negative'}`}
+      title="Classificação de sentimento do modelo BERTimbau para esta avaliação"
+    >
+      {isPos ? '😊 Positivo' : '☹️ Negativo'}
+      {pct != null && <span className="review-sentiment-conf"> · {pct}%</span>}
     </span>
   )
 }
@@ -100,7 +109,7 @@ function ReviewFilters({ filter, setFilter, starFilter, setStarFilter }) {
 // ── Single review item ─────────────────────────────────────
 function ReviewItem({ review }) {
   const { review_title, overall_rating, reviewer_id, reviewer_state, submission_date,
-          review_text, recommend_to_a_friend, sentiment_score } = review
+          review_text, recommend_to_a_friend, sentiment_label, sentiment_confidence } = review
 
   const recYes = recommend_to_a_friend?.toLowerCase() === 'yes'
   const recBadgeClass = recYes ? 'yes' : recommend_to_a_friend?.toLowerCase() === 'no' ? 'no' : ''
@@ -132,7 +141,7 @@ function ReviewItem({ review }) {
             {recYes ? '✓ Recomenda' : '✗ Não recomenda'}
           </span>
         )}
-        <SentimentPill score={sentiment_score} />
+        <SentimentPill label={sentiment_label} confidence={sentiment_confidence} />
       </div>
     </div>
   )
@@ -156,10 +165,16 @@ export default function ProductDetail() {
   const [recFilter,  setRecFilter]  = useState('all')
   const [starFilter, setStarFilter] = useState(0)
 
+  // Re-ranking weight — user-pilotable: score = α·sim + (1−α)·S(p). Default matches
+  // the backend RecommenderConfig (0.7).
+  const [alpha, setAlpha] = useState(DEFAULT_ALPHA)
+
+  // Product + reviews: fetched once per product.
   useEffect(() => {
-    setLoadingProd(true); setLoadingReviews(true); setLoadingRecs(true)
-    setError(null); setProduct(null); setReviews([]); setRecs([])
+    setLoadingProd(true); setLoadingReviews(true)
+    setError(null); setProduct(null); setReviews([])
     setRecFilter('all'); setStarFilter(0)
+    setAlpha(DEFAULT_ALPHA)
 
     getProduct(productId)
       .then(setProduct)
@@ -170,12 +185,20 @@ export default function ProductDetail() {
       .then(setReviews)
       .catch(() => setReviews([]))
       .finally(() => setLoadingReviews(false))
-
-    getRecommendations(productId, 10)
-      .then(setRecs)
-      .catch(console.error)
-      .finally(() => setLoadingRecs(false))
   }, [productId])
+
+  // Recommendations: re-fetched whenever the product or α changes. Debounced so
+  // dragging the α slider doesn't fire a request per intermediate value.
+  useEffect(() => {
+    setLoadingRecs(true)
+    const timer = setTimeout(() => {
+      getRecommendations(productId, 10, alpha)
+        .then(setRecs)
+        .catch(console.error)
+        .finally(() => setLoadingRecs(false))
+    }, 180)
+    return () => clearTimeout(timer)
+  }, [productId, alpha])
 
   const filteredReviews = useMemo(() => {
     return reviews.filter((r) => {
@@ -321,7 +344,13 @@ export default function ProductDetail() {
 
             {/* Recommendations — right after the product, before reviews */}
             <div className="product-detail-right">
-              <RecommendationsPanel recommendations={recs} loading={loadingRecs} />
+              <RecommendationsPanel
+                recommendations={recs}
+                loading={loadingRecs}
+                alpha={alpha}
+                onAlphaChange={setAlpha}
+                defaultAlpha={DEFAULT_ALPHA}
+              />
             </div>
 
             {/* Reviews */}

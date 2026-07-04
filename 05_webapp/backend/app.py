@@ -34,29 +34,49 @@ _product_stats: dict[str, dict] = {}   # product_id → {avg_rating, review_coun
 
 
 # ── Data paths ────────────────────────────────────────────────────────────
-_DATA_ROOT = pathlib.Path(__file__).resolve().parents[2] / "data" / "processed"
+_REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+_DATA_ROOT = _REPO_ROOT / "data" / "processed"
+
+# Champion-model (BERTimbau) inference over the val+test reviews. Same rows as the
+# raw splits below, plus the per-review prediction columns. Preferred source so the
+# UI can show each review's positive/negative label straight from the classifier.
+_INFERRED_REVIEWS = (
+    _REPO_ROOT
+    / "03_sentiment_classifier"
+    / "inference"
+    / "outputs"
+    / "B2W-Reviews01_inferred_bertimbau.csv"
+)
+# Fallback if the inference artifact is unavailable: raw val+test (no labels).
 _REVIEW_SPLITS = [
     _DATA_ROOT / "B2W-Reviews01_val.csv",
     _DATA_ROOT / "B2W-Reviews01_test.csv",
 ]
 
+_SENTIMENT_LABEL_COLUMN = "inferencia_bertimbau"    # 1 = positive, 0 = negative
+_SENTIMENT_PROB_COLUMN = "probabilidade_bertimbau"  # P(positive) from the model
+
 
 def _load_reviews() -> None:
-    """Load val+test splits (including neutral ratings) into in-memory indexes."""
+    """Load val+test reviews (including neutral ratings) into in-memory indexes.
+
+    Prefers the BERTimbau inference artifact so each review carries the classifier's
+    positive/negative label; falls back to the raw splits (no labels) if it's absent.
+    """
     global _reviews_by_product, _product_stats
 
-    frames = []
-    for path in _REVIEW_SPLITS:
-        if path.exists():
-            frames.append(pd.read_csv(path, low_memory=False))
+    if _INFERRED_REVIEWS.exists():
+        df = pd.read_csv(_INFERRED_REVIEWS, low_memory=False)
+    else:
+        frames = [pd.read_csv(p, low_memory=False) for p in _REVIEW_SPLITS if p.exists()]
+        if not frames:
+            return
+        df = pd.concat(frames, ignore_index=True)
 
-    if not frames:
-        return
-
-    df = pd.concat(frames, ignore_index=True)
     df = df.dropna(subset=["product_id"]).copy()
     df["product_id"] = df["product_id"].astype(str)
     df["overall_rating"] = pd.to_numeric(df["overall_rating"], errors="coerce")
+    has_sentiment = _SENTIMENT_LABEL_COLUMN in df.columns
 
     # Build per-product stats
     stats: dict[str, dict] = {}
@@ -73,6 +93,7 @@ def _load_reviews() -> None:
 
         rev_list = []
         for _, row in group.iterrows():
+            label, confidence = _review_sentiment(row) if has_sentiment else (None, None)
             rev_list.append({
                 "reviewer_id": str(row.get("reviewer_id", ""))[:8] + "...",
                 "review_title": str(row.get("review_title", "") or ""),
@@ -83,12 +104,33 @@ def _load_reviews() -> None:
                 "reviewer_gender": str(row.get("reviewer_gender", "") or ""),
                 "reviewer_state": str(row.get("reviewer_state", "") or ""),
                 "submission_date": str(row.get("submission_date", "") or "")[:10],
-                "sentiment_score": None,  # filled by classification pipeline
+                "sentiment_label": label,            # "positive" | "negative" | None
+                "sentiment_confidence": confidence,  # confidence in the predicted label
             })
         reviews_idx[pid] = rev_list
 
     _reviews_by_product = reviews_idx
     _product_stats = stats
+
+
+def _review_sentiment(row: pd.Series) -> tuple[str | None, float | None]:
+    """Map a BERTimbau prediction row to (label, confidence-in-that-label).
+
+    ``probabilidade_bertimbau`` is P(positive); the confidence in the *predicted*
+    class is that value for positives and its complement for negatives.
+    """
+    raw = row.get(_SENTIMENT_LABEL_COLUMN)
+    if pd.isna(raw):
+        return None, None
+    is_positive = int(raw) == 1
+    label = "positive" if is_positive else "negative"
+
+    prob = row.get(_SENTIMENT_PROB_COLUMN)
+    if pd.isna(prob):
+        return label, None
+    p_pos = float(prob)
+    confidence = p_pos if is_positive else 1.0 - p_pos
+    return label, round(confidence, 4)
 
 
 def _enrich_product(product: dict) -> dict:
@@ -166,7 +208,8 @@ class ReviewOut(BaseModel):
     reviewer_gender: str
     reviewer_state: str
     submission_date: str
-    sentiment_score: float | None = None
+    sentiment_label: str | None = None       # "positive" | "negative" (BERTimbau)
+    sentiment_confidence: float | None = None  # confidence in the predicted label
 
 
 # ── App lifecycle ──────────────────────────────────────────────────────────

@@ -83,8 +83,17 @@ function RecItem({ rec, rank, onClick }) {
   )
 }
 
-export default function RecommendationsPanel({ recommendations, loading }) {
+export default function RecommendationsPanel({
+  recommendations,
+  loading,
+  alpha = 0.7,
+  onAlphaChange,
+  defaultAlpha = 0.7,
+}) {
   const navigate = useNavigate()
+  const interactive = typeof onAlphaChange === 'function'
+  const simPct = Math.round(alpha * 100)
+  const sentPct = 100 - simPct
 
   return (
     <>
@@ -124,12 +133,52 @@ export default function RecommendationsPanel({ recommendations, loading }) {
         </div>
       </div>
 
-      {/* Explainability: formula card */}
+      {/* Explainability + interactive α control */}
       <div className="formula-card">
         <div className="formula-card-label">Fórmula do score final</div>
         <div className="formula-expr">score = α · sim + (1−α) · S(p)</div>
+
+        {interactive && (
+          <div className="alpha-control">
+            <div className="alpha-control-head">
+              <span className="alpha-control-title">Ajuste o peso α</span>
+              <span className="alpha-value">α = {alpha.toFixed(2)}</span>
+            </div>
+            <input
+              type="range"
+              className="alpha-slider"
+              min="0"
+              max="1"
+              step="0.05"
+              value={alpha}
+              onChange={(e) => onAlphaChange(parseFloat(e.target.value))}
+              aria-label="Peso α do re-ranking"
+            />
+            <div className="alpha-scale">
+              <span className="alpha-scale-end red">← só sentimento</span>
+              <span className="alpha-scale-end teal">só similaridade →</span>
+            </div>
+            {Math.abs(alpha - defaultAlpha) > 1e-9 && (
+              <button
+                type="button"
+                className="alpha-reset"
+                onClick={() => onAlphaChange(defaultAlpha)}
+              >
+                restaurar padrão (α = {defaultAlpha.toFixed(2)})
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="formula-note">
-          α = 0.5 — S(p) = proporção de avaliações positivas (rating ≥ 4)
+          {alpha >= 0.999
+            ? 'α = 1 — ranqueado apenas por similaridade textual; o sentimento é ignorado.'
+            : alpha <= 0.001
+            ? 'α = 0 — ranqueado apenas por S(p); a similaridade é ignorada.'
+            : `similaridade textual pesa ${simPct}% · sentimento S(p) pesa ${sentPct}%`}
+        </div>
+        <div className="formula-note" style={{ marginTop: 4 }}>
+          S(p) = proporção de avaliações classificadas como positivas pelo BERTimbau.
         </div>
       </div>
     </>
