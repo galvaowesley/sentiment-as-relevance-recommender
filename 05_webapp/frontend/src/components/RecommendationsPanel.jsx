@@ -97,42 +97,6 @@ export default function RecommendationsPanel({
 
   return (
     <>
-      <div className="recs-panel">
-        {/* Header */}
-        <div className="recs-panel-header">
-          <div className="recs-panel-title">Recomendados para você</div>
-          <div className="recs-pipeline">
-            <span className="pipeline-step step1">1</span>
-            <span className="pipeline-label teal">recuperação por similaridade</span>
-            <span className="pipeline-sep">→</span>
-            <span className="pipeline-step step2">2</span>
-            <span className="pipeline-label red">re-rank por sentimento</span>
-          </div>
-        </div>
-
-        {/* List */}
-        <div className="recs-list">
-          {loading && (
-            <div className="loading" style={{ minHeight: 120 }}>Carregando…</div>
-          )}
-
-          {!loading && recommendations.length === 0 && (
-            <div style={{ padding: '24px 18px', color: '#9B9B9B', fontSize: 14 }}>
-              Nenhuma recomendação disponível.
-            </div>
-          )}
-
-          {!loading && recommendations.map((rec, i) => (
-            <RecItem
-              key={rec.product_id}
-              rec={rec}
-              rank={i + 1}
-              onClick={() => navigate(`/product/${encodeURIComponent(rec.product_id)}`)}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Explainability + interactive α control */}
       <div className="formula-card">
         <div className="formula-card-label">Fórmula do score final</div>
@@ -179,6 +143,42 @@ export default function RecommendationsPanel({
         </div>
         <div className="formula-note" style={{ marginTop: 4 }}>
           S(p) = proporção de avaliações classificadas como positivas pelo BERTimbau.
+        </div>
+      </div>
+
+      <div className="recs-panel">
+        {/* Header */}
+        <div className="recs-panel-header">
+          <div className="recs-panel-title">Recomendados para você</div>
+          <div className="recs-pipeline">
+            <span className="pipeline-step step1">1</span>
+            <span className="pipeline-label teal">recuperação por similaridade</span>
+            <span className="pipeline-sep">→</span>
+            <span className="pipeline-step step2">2</span>
+            <span className="pipeline-label red">re-rank por sentimento</span>
+          </div>
+        </div>
+
+        {/* List */}
+        <div className="recs-list">
+          {loading && (
+            <div className="loading" style={{ minHeight: 120 }}>Carregando…</div>
+          )}
+
+          {!loading && recommendations.length === 0 && (
+            <div style={{ padding: '24px 18px', color: '#9B9B9B', fontSize: 14 }}>
+              Nenhuma recomendação disponível.
+            </div>
+          )}
+
+          {!loading && recommendations.map((rec, i) => (
+            <RecItem
+              key={rec.product_id}
+              rec={rec}
+              rank={i + 1}
+              onClick={() => navigate(`/product/${encodeURIComponent(rec.product_id)}`)}
+            />
+          ))}
         </div>
       </div>
     </>
