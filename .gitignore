@@ -26,3 +26,12 @@ venv/
 # Node
 node_modules/
 05_webapp/frontend/dist/
+
+# Latex
+*.aux
+*.bbl
+*.blg
+*.fls
+*.out
+*.gz
+*.fdb_latexmk
