@@ -1,17 +1,17 @@
-# bertimbau_lr — BERTimbau [CLS] + Regressão Logística
+# bertimbau_lr — BERTimbau [CLS] + Regressão Logística (Campeão)
 
-Usa o BERTimbau Base (110M parâmetros) como extrator de features com **pesos congelados**. O vetor do token `[CLS]` da última camada (768 dimensões) é extraído para cada review e usado como entrada de um classificador de Regressão Logística externo.
+Usa o BERTimbau Base (`neuralmind/bert-base-portuguese-cased`, 110M parâmetros) como extrator de features com **pesos congelados**. O vetor do token `[CLS]` da última camada (768 dimensões) é extraído para cada review e usado como entrada de um classificador de Regressão Logística externo.
 
-Serve como ponto intermediário entre o baseline esparso (TF-IDF) e o fine-tuning completo, isolando a contribuição da representação contextual pré-treinada sem ajuste supervisionado.
+É o **modelo campeão** em uso: sua inferência (`eval_bertimbau_lr.py`) gera o CSV `B2W-Reviews01_inferred_bertimbau.csv`, promovido para `data/results_from_best_model/` e consumido pelo recomendador (Pipeline 2) para calcular o score de positividade `S(p)`.
 
 ## Arquivos
 
 | Arquivo | Descrição |
 |---|---|
-| `train_bertimbau_lr.py` | Script completo de extração de embeddings, validação cruzada, avaliação e salvamento |
-| `bertimbau.py` | Snippet de referência para carregamento do modelo |
+| `train_bertimbau_lr.py` | Extração de embeddings `[CLS]`, validação cruzada, avaliação e salvamento |
+| `eval_bertimbau_lr.py` | Inferência do modelo treinado → CSV enriquecido (`--dataset ""\|no_neutral`) |
 
-## Pipeline
+## Pipeline (treino)
 
 1. Carrega os splits sem neutros (`data/processed/B2W-Reviews01_no_neutral_*.csv`)
 2. Normalização BERT via `02_preprocessing/bert/tokenize.py` (sem lowercase, sem remoção de acentos)
@@ -22,15 +22,7 @@ Serve como ponto intermediário entre o baseline esparso (TF-IDF) e o fine-tunin
 
 ## Cache de embeddings
 
-A extração é cara (~30 min em CPU para 70k amostras). Na primeira execução os embeddings são salvos em:
-
-```
-checkpoints/bert_cls_train_X.npy  /  bert_cls_train_y.npy
-checkpoints/bert_cls_val_X.npy    /  bert_cls_val_y.npy
-checkpoints/bert_cls_test_X.npy   /  bert_cls_test_y.npy
-```
-
-Execuções subsequentes carregam diretamente do cache, pulando o BERT.
+A extração é cara (~30 min em CPU). Na primeira execução os embeddings são salvos em `checkpoints/bert_cls_{train,val,test}_X.npy` (+ `_y.npy`) e reaproveitados em execuções seguintes. Os `.npy` **não são versionados** (ver `.gitignore`).
 
 ## Hiperparâmetros buscados
 
@@ -45,12 +37,20 @@ Execuções subsequentes carregam diretamente do cache, pulando o BERT.
 
 | Arquivo | Descrição |
 |---|---|
-| `checkpoints/bert_cls_*_X.npy` | Embeddings [CLS] cacheados por split |
+| `checkpoints/bert_cls_*_X.npy` | Embeddings `[CLS]` cacheados por split (não versionados) |
 | `checkpoints/bertimbau_lr_model.pkl` | Melhor modelo de Regressão Logística |
-| `checkpoints/bertimbau_lr_results.json` | Métricas de avaliação no val e no test |
+| `checkpoints/bertimbau_lr_results.json` | Métricas no val e no test (coletânea curada em `../train_evaluation/`) |
+| `../inference/outputs/B2W-Reviews01_inferred_bertimbau.csv` | CSV enriquecido (colunas `inferencia_bertimbau`, `probabilidade_bertimbau`) |
 
 ## Execução
 
 ```bash
+# via Makefile na raiz
+make train-bertimbau
+make infer-bertimbau
+make champion           # treino + inferência + promove o CSV para data/results_from_best_model/
+
+# ou manualmente
 python 03_sentiment_classifier/bertimbau_lr/train_bertimbau_lr.py
+python 03_sentiment_classifier/bertimbau_lr/eval_bertimbau_lr.py --dataset ""
 ```
