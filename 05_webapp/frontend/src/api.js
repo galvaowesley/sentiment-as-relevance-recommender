@@ -30,5 +30,8 @@ export const getProduct = (id) => request(`/products/${encodeURIComponent(id)}`)
 export const getProductReviews = (id) =>
   request(`/products/${encodeURIComponent(id)}/reviews`)
 
-export const getRecommendations = (productId, topN = 10) =>
-  request(`/recommend?product_id=${encodeURIComponent(productId)}&top_n=${topN}`)
+export const getRecommendations = (productId, topN = 10, alpha) => {
+  const qs = new URLSearchParams({ product_id: productId, top_n: topN })
+  if (alpha != null) qs.set('alpha', alpha)
+  return request(`/recommend?${qs}`)
+}

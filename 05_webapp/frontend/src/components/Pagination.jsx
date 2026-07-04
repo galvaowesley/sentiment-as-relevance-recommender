@@ -77,7 +77,7 @@ export default function Pagination({ page, pageSize, total, onPage }) {
         Próxima →
       </button>
 
-      <span style={{ fontSize: 12, color: '#9B9B9B', marginLeft: 8 }}>
+      <span className="pagination-summary">
         {total} produto{total !== 1 ? 's' : ''} · {totalPages} página{totalPages !== 1 ? 's' : ''}
       </span>
     </div>

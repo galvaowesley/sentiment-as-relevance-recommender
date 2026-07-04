@@ -1,0 +1,14 @@
+.git
+**/__pycache__
+*.py[cod]
+.venv
+venv
+node_modules
+05_webapp/frontend/node_modules
+05_webapp/frontend/dist
+.pytest_cache
+.ipynb_checkpoints
+.DS_Store
+data/raw
+01_eda
+06_evaluation

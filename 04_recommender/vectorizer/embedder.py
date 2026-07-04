@@ -32,6 +32,20 @@ def pick_device(preferred: str | None = None) -> str:
     return "cpu"
 
 
+def describe_device(device: str) -> str:
+    """Human-readable label for the torch device used to vectorize."""
+    if device == "cuda":
+        try:
+            import torch
+
+            return f"GPU (CUDA) — {torch.cuda.get_device_name(0)}"
+        except Exception:
+            return "GPU (CUDA)"
+    if device == "mps":
+        return "Apple Silicon (MPS)"
+    return "CPU"
+
+
 class Qwen3Embedder:
     """Wraps a ``sentence-transformers`` model to embed product titles."""
 
@@ -46,6 +60,7 @@ class Qwen3Embedder:
         from sentence_transformers import SentenceTransformer
 
         self.device = pick_device(device)
+        print(f"[embedder] vectorizing on {describe_device(self.device)}")
         model_kwargs: dict[str, str] = {}
         # Qwen3 uses grouped-query attention; the fused SDPA matmul crashes on
         # Apple MPS ("Failed to infer result type"). Eager attention expands the

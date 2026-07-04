@@ -28,9 +28,30 @@ from typing import Any
 import numpy as np
 
 from config import RecommenderConfig
-from data import build_catalog, catalog_to_frame, load_reviews
-from reranking.sentiment import MockSentimentScorer, SentimentScorer
+from data import (
+    build_catalog,
+    catalog_to_frame,
+    compute_sentiment_scores,
+    load_reviews,
+)
+from reranking.sentiment import PredictedLabelSentimentScorer, SentimentScorer
 from vector_store.store import ZvecVectorStore
+
+
+def _write_sentiment_scores(config: RecommenderConfig, df: Any) -> None:
+    """Persist the standalone per-product S(p) table (Pipeline 1 artifact).
+
+    Skipped when the reviews carry no predicted-label column (e.g. the test
+    fixtures score by rating), so a mock build never touches ``data/processed``.
+    """
+    if config.sentiment_label_column not in df.columns:
+        print(f"[sentiment] skip: no '{config.sentiment_label_column}' column")
+        return
+    scores = compute_sentiment_scores(df, config.sentiment_label_column)
+    path = config.sentiment_scores_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    scores.to_parquet(path, index=False)
+    print(f"[sentiment] {len(scores)} products -> {path}")
 
 
 def build_corpus(
@@ -41,6 +62,7 @@ def build_corpus(
 ) -> int:
     """Build the searchable corpus index and catalog. Returns product count."""
     df = load_reviews(config.corpus_splits)
+    _write_sentiment_scores(config, df)
     records = build_catalog(df, scorer, min_reviews=config.min_reviews, limit=limit)
     if not records:
         raise RuntimeError("Corpus is empty; check splits and --min-reviews")
@@ -97,7 +119,10 @@ def _write_meta(config: RecommenderConfig, counts: dict[str, int], dim: int) -> 
         "embedding_dim": dim,
         "query_instruction": config.query_instruction,
         "min_reviews": config.min_reviews,
+        "recommend_min_reviews": config.recommend_min_reviews,
         "positive_rating_threshold": config.positive_rating_threshold,
+        "sentiment_label_column": config.sentiment_label_column,
+        "sentiment_source": [Path(p).name for p in config.corpus_splits],
         "collection_name": config.collection_name,
         "counts": counts,
         "built_at": datetime.now(timezone.utc).isoformat(),
@@ -123,13 +148,17 @@ def build_all(
             query_instruction=config.query_instruction,
             batch_size=config.batch_size,
         )
-    scorer = scorer or MockSentimentScorer(config.positive_rating_threshold)
+    # Corpus and storefront both read the BERTimbau-inferred source, so both use the
+    # real classifier predictions for S(p). An explicit scorer (tests) overrides this.
+    default_scorer = scorer or PredictedLabelSentimentScorer(config.sentiment_label_column)
 
     counts: dict[str, int] = {}
     if corpus:
-        counts["corpus"] = build_corpus(config, embedder, scorer, limit=limit)
+        counts["corpus"] = build_corpus(config, embedder, default_scorer, limit=limit)
     if storefront:
-        counts["storefront"] = build_storefront(config, embedder, scorer, limit=limit)
+        counts["storefront"] = build_storefront(
+            config, embedder, default_scorer, limit=limit
+        )
 
     _write_meta(config, counts, dim=int(getattr(embedder, "dimension", 0)))
     return counts

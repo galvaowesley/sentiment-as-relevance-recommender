@@ -1,15 +1,23 @@
-"""Unit tests for the mock sentiment scorer."""
+"""Unit tests for the sentiment scorers."""
 
 from __future__ import annotations
 
 import pandas as pd
 import pytest
 
-from reranking.sentiment import MockSentimentScorer, SentimentScorer
+from reranking.sentiment import (
+    MockSentimentScorer,
+    PredictedLabelSentimentScorer,
+    SentimentScorer,
+)
 
 
 def _reviews(ratings: list) -> pd.DataFrame:
     return pd.DataFrame({"overall_rating": ratings})
+
+
+def _labels(values: list) -> pd.DataFrame:
+    return pd.DataFrame({"inferencia_bertimbau": values})
 
 
 def test_positive_fraction():
@@ -35,3 +43,29 @@ def test_empty_and_nan_handling():
 
 def test_satisfies_protocol():
     assert isinstance(MockSentimentScorer(), SentimentScorer)
+
+
+def test_predicted_label_positive_fraction():
+    scorer = PredictedLabelSentimentScorer()
+    assert scorer.score_product(_labels([1, 1, 0, 1])) == pytest.approx(0.75)
+    assert scorer.score_product(_labels([0, 0])) == pytest.approx(0.0)
+    assert scorer.score_product(_labels([1, 1, 1])) == pytest.approx(1.0)
+
+
+def test_predicted_label_empty_and_nan_handling():
+    scorer = PredictedLabelSentimentScorer()
+    assert scorer.score_product(_labels([])) == 0.0
+    # Non-numeric / missing labels are ignored: only the valid 1 counts -> 1.0.
+    assert scorer.score_product(_labels([None, 1])) == pytest.approx(1.0)
+    # A NaN label among negatives leaves only negatives -> 0.0.
+    assert scorer.score_product(_labels([None, 0, 0])) == pytest.approx(0.0)
+
+
+def test_predicted_label_custom_column():
+    scorer = PredictedLabelSentimentScorer(label_column="inferencia_tfidf")
+    reviews = pd.DataFrame({"inferencia_tfidf": [1, 0, 1, 0]})
+    assert scorer.score_product(reviews) == pytest.approx(0.5)
+
+
+def test_predicted_label_satisfies_protocol():
+    assert isinstance(PredictedLabelSentimentScorer(), SentimentScorer)

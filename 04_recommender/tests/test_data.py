@@ -5,7 +5,13 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from data import CATALOG_COLUMNS, build_catalog, catalog_to_frame, load_reviews
+from data import (
+    CATALOG_COLUMNS,
+    build_catalog,
+    catalog_to_frame,
+    compute_sentiment_scores,
+    load_reviews,
+)
 from reranking.sentiment import MockSentimentScorer
 
 
@@ -36,6 +42,28 @@ def test_catalog_to_frame_columns(corpus_df):
     records = build_catalog(corpus_df, MockSentimentScorer())
     frame = catalog_to_frame(records)
     assert list(frame.columns) == list(CATALOG_COLUMNS)
+
+
+def test_compute_sentiment_scores():
+    df = pd.DataFrame(
+        {
+            "product_id": ["P1", "P1", "P1", "P1", "P2", "P2"],
+            "inferencia_bertimbau": [1, 1, 1, 0, 0, 0],
+        }
+    )
+    scores = compute_sentiment_scores(df).set_index("product_id")
+
+    assert set(scores.columns) == {"num_reviews", "num_positive", "sentiment_score"}
+    assert scores.loc["P1", "num_reviews"] == 4
+    assert scores.loc["P1", "num_positive"] == 3
+    assert scores.loc["P1", "sentiment_score"] == pytest.approx(0.75)
+    assert scores.loc["P2", "sentiment_score"] == pytest.approx(0.0)
+
+
+def test_compute_sentiment_scores_missing_column():
+    df = pd.DataFrame({"product_id": ["P1"]})
+    with pytest.raises(ValueError):
+        compute_sentiment_scores(df)
 
 
 def test_load_reviews_missing_file(tmp_path):

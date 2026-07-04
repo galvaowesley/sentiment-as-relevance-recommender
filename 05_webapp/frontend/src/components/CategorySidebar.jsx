@@ -8,6 +8,7 @@ const TOGGLE_W   = 40
 export default function CategorySidebar() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [lv1List, setLv1List]     = useState([])
   const [lv2Map, setLv2Map]       = useState({})
   const [openLv1, setOpenLv1]     = useState(null)
@@ -37,6 +38,7 @@ export default function CategorySidebar() {
     if (c) next.set('category', c)
     setSearchParams(next)
     setOpenLv1(c || null)
+    setMobileOpen(false)
   }
 
   function selectLv2(c) {
@@ -44,6 +46,7 @@ export default function CategorySidebar() {
     if (c) { next.set('cat2', c) } else { next.delete('cat2') }
     next.delete('page')
     setSearchParams(next)
+    setMobileOpen(false)
   }
 
   function toggleAccordion(c) {
@@ -68,20 +71,41 @@ export default function CategorySidebar() {
   }
 
   return (
-    <aside
-      style={{
-        width: w,
-        minWidth: w,
-        flexShrink: 0,
-        background: '#fff',
-        borderRight: '1px solid rgba(0,0,0,0.08)',
-        transition: 'width 0.2s ease, min-width 0.2s ease',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignSelf: 'stretch',
-      }}
-    >
+    <>
+      {/* Mobile: floating trigger to open the category drawer */}
+      <button
+        className="sidebar-mobile-toggle"
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label="Categorias"
+      >
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <line x1="1.5" y1="3.5"  x2="13.5" y2="3.5"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          <line x1="1.5" y1="7.5"  x2="13.5" y2="7.5"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          <line x1="1.5" y1="11.5" x2="13.5" y2="11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+        </svg>
+        Categorias
+      </button>
+
+      {/* Mobile: backdrop closes the drawer */}
+      {mobileOpen && (
+        <div className="sidebar-backdrop" onClick={() => setMobileOpen(false)} />
+      )}
+
+      <aside
+        className={`category-sidebar${mobileOpen ? ' open' : ''}`}
+        style={{
+          width: w,
+          minWidth: w,
+          flexShrink: 0,
+          background: '#fff',
+          borderRight: '1px solid rgba(0,0,0,0.08)',
+          transition: 'width 0.2s ease, min-width 0.2s ease',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          alignSelf: 'stretch',
+        }}
+      >
       {/* Toggle button */}
       <button
         onClick={() => setCollapsed((v) => !v)}
@@ -218,6 +242,7 @@ export default function CategorySidebar() {
           )
         })}
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }

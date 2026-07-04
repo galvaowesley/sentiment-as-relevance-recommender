@@ -3,11 +3,16 @@
   "embedding_dim": 1024,
   "query_instruction": "Given a retail product title, retrieve titles of similar products",
   "min_reviews": 1,
+  "recommend_min_reviews": 5,
   "positive_rating_threshold": 4,
+  "sentiment_label_column": "inferencia_bertimbau",
+  "sentiment_source": [
+    "B2W-Reviews01_inferred_bertimbau.csv"
+  ],
   "collection_name": "product_corpus",
   "counts": {
-    "corpus": 5000,
-    "storefront": 5000
+    "corpus": 17081,
+    "storefront": 17081
   },
-  "built_at": "2026-06-28T01:47:16.979144+00:00"
+  "built_at": "2026-07-04T00:34:09.036798+00:00"
 }
