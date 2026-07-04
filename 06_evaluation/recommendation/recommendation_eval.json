@@ -1,0 +1,519 @@
+{
+  "generated_at": "2026-07-03T23:38:11.724989+00:00",
+  "source": "recommender API (04_recommender) via webapp backend :8000",
+  "params": {
+    "top_n": 10,
+    "alpha": 0.7,
+    "score_formula": "alpha*sim(q,p) + (1-alpha)*S(p)",
+    "recommend_min_reviews": 5,
+    "relevance_criterion": {
+      "high": "S(p) > 0.7",
+      "low": "S(p) < 0.3"
+    },
+    "off_topic_threshold_sim": 0.5
+  },
+  "categories": {
+    "low_risk_high_volume": {
+      "category": "Celulares e Smartphones",
+      "rationale": "Categoria grande e muito avaliada (1247 produtos, 8363 avaliacoes, 250 recomendaveis). Produtos coerentes e bem avaliados -> baixo risco: recomenda smartphones similares com S(p) alto.",
+      "queries": [
+        {
+          "query_product": {
+            "product_id": "132444092",
+            "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Platinum",
+            "site_category_lv1": "Celulares e Smartphones",
+            "site_category_lv2": "Smartphone",
+            "num_reviews": 342,
+            "sentiment_score": 0.8596491228070176
+          },
+          "recommendation_quality": {
+            "mean_similarity": 0.8376,
+            "mean_sentiment": 0.883,
+            "min_sentiment": 0.8,
+            "n_low_relevance": 0,
+            "n_high_relevance": 10,
+            "n_off_topic": 0,
+            "n_same_category": 10
+          },
+          "n_recommendations": 10,
+          "recommendations": [
+            {
+              "product_id": "132444754",
+              "product_name": "Smartphone Motorola Moto G 5s Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dupla - Azul Topázio",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 19,
+              "sentiment_score": 0.9473684210526316,
+              "score": 0.887692295877557,
+              "similarity": 0.862116813659668
+            },
+            {
+              "product_id": "132444738",
+              "product_name": "Smartphone Motorola Moto G5S Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dupla - Platinum",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 155,
+              "sentiment_score": 0.8774193548387097,
+              "score": 0.8833579904802384,
+              "similarity": 0.8859031200408936
+            },
+            {
+              "product_id": "132444050",
+              "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Dourado",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 223,
+              "sentiment_score": 0.8475336322869955,
+              "score": 0.8744944539572626,
+              "similarity": 0.8860490918159485
+            },
+            {
+              "product_id": "132444771",
+              "product_name": "Smartphone Motorola Moto G 5s Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dual Cam - Ouro rosa",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 98,
+              "sentiment_score": 0.8877551020408163,
+              "score": 0.8686163086064007,
+              "similarity": 0.8604139685630798
+            },
+            {
+              "product_id": "132444076",
+              "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Azul Safira",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 10,
+              "sentiment_score": 0.8,
+              "score": 0.8658829414844513,
+              "similarity": 0.8941184878349304
+            },
+            {
+              "product_id": "132222369",
+              "product_name": "Smartphone Motorola Moto G5 Plus Dual Chip Android Nougat 7.0 Tela 5,2\" Octa-Core 2GHz 2GB 4G Câmera 12MP - Azul Safira",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 35,
+              "sentiment_score": 0.8571428571428571,
+              "score": 0.8332220886434827,
+              "similarity": 0.8229703307151794
+            },
+            {
+              "product_id": "132207724",
+              "product_name": "Smartphone Motorola Moto E4 Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Quad-Core 1.3GHz 16GB 4G Câmera 13MP - Azul Safira",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 12,
+              "sentiment_score": 0.9166666666666666,
+              "score": 0.8301740050315857,
+              "similarity": 0.7931057214736938
+            },
+            {
+              "product_id": "131348648",
+              "product_name": "Smartphone Moto G 5 Plus Dual Chip Android 7.0 Tela 5.2\" 32GB 4G Câmera 12MP - Ouro",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 28,
+              "sentiment_score": 0.8214285714285714,
+              "score": 0.8287990433829171,
+              "similarity": 0.8319578170776367
+            },
+            {
+              "product_id": "132531701",
+              "product_name": "Smartphone LG Q6 Plus Dual Chip Android 7.0 Tela 5.5\" Full Hd+ Snapdragon  MSM8940 64GB 4G Câmera 13MP - Platinum",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 16,
+              "sentiment_score": 1.0,
+              "score": 0.8212648093700409,
+              "similarity": 0.7446640133857727
+            },
+            {
+              "product_id": "132474081",
+              "product_name": "Smartphone Moto G 5S Dual Chip Android 7.0 Tela 5.2\" Snapdradon 32GB 4G Wi-Fi Câmera 16MP - Prata",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 159,
+              "sentiment_score": 0.8742138364779874,
+              "score": 0.8188818639179446,
+              "similarity": 0.7951681613922119
+            }
+          ]
+        },
+        {
+          "query_product": {
+            "product_id": "128010777",
+            "product_name": "Smartphone Samsung Galaxy J7 Metal Dual Chip Android 6.0 Tela 5.5\" 16GB 4G Câmera 13MP - Dourado",
+            "site_category_lv1": "Celulares e Smartphones",
+            "site_category_lv2": "Smartphone",
+            "num_reviews": 248,
+            "sentiment_score": 0.8991935483870968
+          },
+          "recommendation_quality": {
+            "mean_similarity": 0.7961,
+            "mean_sentiment": 0.913,
+            "min_sentiment": 0.8415,
+            "n_low_relevance": 0,
+            "n_high_relevance": 10,
+            "n_off_topic": 0,
+            "n_same_category": 10
+          },
+          "n_recommendations": 10,
+          "recommendations": [
+            {
+              "product_id": "128011681",
+              "product_name": "Smartphone Samsung Galaxy J7 Metal Dual Chip Android 6.0 Tela 5.5\" 16GB 4G Câmera 13MP - Preto",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 173,
+              "sentiment_score": 0.8901734104046243,
+              "score": 0.8903316423383062,
+              "similarity": 0.8903994560241699
+            },
+            {
+              "product_id": "132371225",
+              "product_name": "Smartphone Samsung Galaxy J7 Neo Dual Chip Android 7.0 Tela 5.5\" 16GB 4G Câmera 13MP - Dourado",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 26,
+              "sentiment_score": 0.8846153846153846,
+              "score": 0.8340330609908471,
+              "similarity": 0.8123549222946167
+            },
+            {
+              "product_id": "131664641",
+              "product_name": "Smartphone Samsung Galaxy J7 Prime Dual Chip Android 6.0 Tela 5.5\" Octa- Core 1.6 GHz 32GB 4G Câmera 13MP - Rosa",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 108,
+              "sentiment_score": 0.8888888888888888,
+              "score": 0.8323145429293315,
+              "similarity": 0.8080683946609497
+            },
+            {
+              "product_id": "132380287",
+              "product_name": "Smartphone Samsung Galaxy J5 Pro Dual Chip Android 7.0 Tela 5,2\" Octa-Core 1.6 GHz 32GB 4G Câmera 13MP - Preto",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 108,
+              "sentiment_score": 0.8981481481481481,
+              "score": 0.8312964644696977,
+              "similarity": 0.802645742893219
+            },
+            {
+              "product_id": "132390047",
+              "product_name": "Smartphone Samsung Galaxy J5 Pro Dual Chip Android 7.0 Tela 5,2\" Octa-Core 1.6 GHz 32GB 4G Câmera 13MP - Dourado",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 183,
+              "sentiment_score": 0.8415300546448088,
+              "score": 0.8256199150788979,
+              "similarity": 0.8188012838363647
+            },
+            {
+              "product_id": "131665660",
+              "product_name": "Smartphone Samsung Galaxy J2 Prime TV Dual Chip Android 6.0 Tela 5\" Quad-Core 1.4 GHz 16GB 4G Câmera 5MP - Dourado",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 86,
+              "sentiment_score": 0.9534883720930232,
+              "score": 0.8251767582671587,
+              "similarity": 0.7701860666275024
+            },
+            {
+              "product_id": "132370206",
+              "product_name": "Smartphone Samsung Galaxy J7 Neo Dual Chip Android 7.0 Tela 5.5\" 16GB 4G Câmera 13MP com TV - Preto",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 28,
+              "sentiment_score": 0.8928571428571429,
+              "score": 0.8250232662473406,
+              "similarity": 0.7959516048431396
+            },
+            {
+              "product_id": "132276640",
+              "product_name": "Smartphone Samsung Galaxy J5 Prime Dual Chip Android 6.0 Tela 5\" Quad-Core 1.4 GHz 32GB 4G Wi-Fi Câmera 13MP com Leitor de Digital - Preto",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 88,
+              "sentiment_score": 0.9090909090909092,
+              "score": 0.8199240424416282,
+              "similarity": 0.7817096710205078
+            },
+            {
+              "product_id": "131657512",
+              "product_name": "Smartphone Samsung Galaxy J2 Prime TV Dual Chip Android 6.0 Tela 5\" Quad-Core 1.4 GHz 16GB 4G Cãmera 8MP Rosa",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 69,
+              "sentiment_score": 0.9710144927536232,
+              "score": 0.8151563325653906,
+              "similarity": 0.7483599781990051
+            },
+            {
+              "product_id": "132380105",
+              "product_name": "Smartphone Samsung Galaxy A5 Dual Chip Android 6.0 Tela 5,2\" Octa-Core 1.9GHz 64GB 4G Câmera 16MP - Rosa",
+              "site_category_lv1": "Celulares e Smartphones",
+              "site_category_lv2": "Smartphone",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.8131145477294922,
+              "similarity": 0.7330207824707031
+            }
+          ]
+        }
+      ]
+    },
+    "high_risk": {
+      "category": "Móveis",
+      "rationale": "Categoria com MAIS produtos (2028) porem PIOR sentimento entre as grandes (S medio dos recomendaveis = 0.39; 23/61 recomendaveis com S<0.3). Alto risco de recomendacao ruim: (a) deriva de tema por baixa similaridade e (b) quase-duplicatas de S(p) baixo promovidas ao topo.",
+      "queries": [
+        {
+          "query_product": {
+            "product_id": "13628860",
+            "product_name": "Cama Solteiro Barcelona Com Auxiliar - Branco - Tebarrot Móveis",
+            "site_category_lv1": "Móveis",
+            "site_category_lv2": "Cama",
+            "num_reviews": 6,
+            "sentiment_score": 0.1666666666666666
+          },
+          "recommendation_quality": {
+            "mean_similarity": 0.4382,
+            "mean_sentiment": 0.9167,
+            "min_sentiment": 0.75,
+            "n_low_relevance": 0,
+            "n_high_relevance": 10,
+            "n_off_topic": 10,
+            "n_same_category": 1
+          },
+          "n_recommendations": 10,
+          "recommendations": [
+            {
+              "product_id": "124330001",
+              "product_name": "Bomba Tira-Leite Materno Manual G-Tech Confort",
+              "site_category_lv1": "Bebês",
+              "site_category_lv2": "Para Mamãe",
+              "num_reviews": 6,
+              "sentiment_score": 1.0,
+              "score": 0.6096235752105713,
+              "similarity": 0.442319393157959
+            },
+            {
+              "product_id": "132165827",
+              "product_name": "Notebook Samsung Chromebook AD2BR Intel Celeron Dual Core 2GB 16GB Tela LED HD 11.6\" Chrome OS - Preto",
+              "site_category_lv1": "Informática",
+              "site_category_lv2": "Chromebook",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.609583604335785,
+              "similarity": 0.44226229190826416
+            },
+            {
+              "product_id": "13099796",
+              "product_name": "Sapateira Safira Branca Suporta Varios Sapatos",
+              "site_category_lv1": "Móveis",
+              "site_category_lv2": "Sapateira",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.6045209884643554,
+              "similarity": 0.4350299835205078
+            },
+            {
+              "product_id": "8312388",
+              "product_name": "Mesinha Didática Infantil Com Cadeiras 5825 - Poliplac",
+              "site_category_lv1": "Brinquedos",
+              "site_category_lv2": "Móveis para Crianças",
+              "num_reviews": 6,
+              "sentiment_score": 1.0,
+              "score": 0.6029535710811615,
+              "similarity": 0.4327908158302307
+            },
+            {
+              "product_id": "127743039",
+              "product_name": "Jogo de Panelas Tramontina Paris 7 Peças Cereja Alumínio",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Panelas",
+              "num_reviews": 76,
+              "sentiment_score": 0.9605263157894736,
+              "score": 0.5831402803722181,
+              "similarity": 0.4214034080505371
+            },
+            {
+              "product_id": "132085747",
+              "product_name": "Cadeira de Alimentação Portátil Smart Azul - Cosco",
+              "site_category_lv1": "Bebês",
+              "site_category_lv2": "Alimentação",
+              "num_reviews": 13,
+              "sentiment_score": 0.9230769230769232,
+              "score": 0.5813335404946254,
+              "similarity": 0.4348720908164978
+            },
+            {
+              "product_id": "132442118",
+              "product_name": "Carrinho de Bebê Travel System Moove Rosa Trama - Cosco",
+              "site_category_lv1": "Bebês",
+              "site_category_lv2": "Passeio",
+              "num_reviews": 10,
+              "sentiment_score": 0.9,
+              "score": 0.5676322293281555,
+              "similarity": 0.42518889904022217
+            },
+            {
+              "product_id": "31070523",
+              "product_name": "Grade De Proteção Segurança Para Cama Idosos E Crianças Bebe",
+              "site_category_lv1": "Bebês",
+              "site_category_lv2": "Segurança",
+              "num_reviews": 5,
+              "sentiment_score": 0.8,
+              "score": 0.5638436102867126,
+              "similarity": 0.46263372898101807
+            },
+            {
+              "product_id": "28315147",
+              "product_name": "Suporte Ergonômico Regulável para Notebook - Preto",
+              "site_category_lv1": "Informática e Acessórios",
+              "site_category_lv2": "Acessórios para Notebook",
+              "num_reviews": 8,
+              "sentiment_score": 0.75,
+              "score": 0.5503472536802292,
+              "similarity": 0.464781790971756
+            },
+            {
+              "product_id": "131553641",
+              "product_name": "Cafeteira Expresso Bvstem6701ss Oster Preta 19 Bar",
+              "site_category_lv1": "Eletroportáteis",
+              "site_category_lv2": "Cafeteira",
+              "num_reviews": 6,
+              "sentiment_score": 0.8333333333333334,
+              "score": 0.5441916048526765,
+              "similarity": 0.42027372121810913
+            }
+          ],
+          "risk_note": "Deriva de tema: cama de solteiro -> rec #1 'Bomba Tira-Leite Materno' (sim~0.44, S=1.0). Recomendacoes de S alto porem irrelevantes (similaridade media ~0.44)."
+        },
+        {
+          "query_product": {
+            "product_id": "24266805",
+            "product_name": "Guarda Roupa Casal Conjugado com Cabeceira e Ponte Modulada Firenze Móveis Europa Branco Acetinado",
+            "site_category_lv1": "Móveis",
+            "site_category_lv2": "Guarda-Roupa",
+            "num_reviews": 9,
+            "sentiment_score": 0.2222222222222222
+          },
+          "recommendation_quality": {
+            "mean_similarity": 0.5295,
+            "mean_sentiment": 0.9174,
+            "min_sentiment": 0.2,
+            "n_low_relevance": 1,
+            "n_high_relevance": 9,
+            "n_off_topic": 6,
+            "n_same_category": 1
+          },
+          "n_recommendations": 10,
+          "recommendations": [
+            {
+              "product_id": "24266811",
+              "product_name": "Guarda Roupa Casal Conjugado Com Cabeceira E Ponte Modulada Firenze Móveis Europa Braúna",
+              "site_category_lv1": "Móveis",
+              "site_category_lv2": "Guarda-Roupa",
+              "num_reviews": 5,
+              "sentiment_score": 0.2,
+              "score": 0.6632756567001343,
+              "similarity": 0.8618223667144775
+            },
+            {
+              "product_id": "111300399",
+              "product_name": "Conjunto de Utensílios 6 Peças Inox - Euro Home",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Utensílios e Acessórios Domésticos",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.6630060136318208,
+              "similarity": 0.5185800194740295
+            },
+            {
+              "product_id": "112248705",
+              "product_name": "Conjunto de Facas Athus Inox Preto 10 Peças",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Pratos e Talheres",
+              "num_reviews": 11,
+              "sentiment_score": 1.0,
+              "score": 0.6566031634807588,
+              "similarity": 0.5094330906867981
+            },
+            {
+              "product_id": "114078324",
+              "product_name": "Maleta de Maquiagem Fenzza Rose",
+              "site_category_lv1": "Beleza e Perfumaria",
+              "site_category_lv2": "Maquiagem",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.6521810829639435,
+              "similarity": 0.5031158328056335
+            },
+            {
+              "product_id": "120518269",
+              "product_name": "Calça LUK Jegging Color Bordado Coração",
+              "site_category_lv1": "Moda",
+              "site_category_lv2": "Infantil",
+              "num_reviews": 5,
+              "sentiment_score": 1.0,
+              "score": 0.646487694978714,
+              "similarity": 0.49498242139816284
+            },
+            {
+              "product_id": "127533251",
+              "product_name": "Conjunto de Assadeiras de Vidro 10 Peças - Nadir Figueiredo",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Bandejas, Assadeiras e Réchaud",
+              "num_reviews": 26,
+              "sentiment_score": 1.0,
+              "score": 0.6444117546081543,
+              "similarity": 0.4920167922973633
+            },
+            {
+              "product_id": "129164313",
+              "product_name": "Conjunto de Travessas 25/30/35cm 3 Peças at.home",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Bandejas, Assadeiras e Réchaud",
+              "num_reviews": 6,
+              "sentiment_score": 1.0,
+              "score": 0.6375113129615784,
+              "similarity": 0.4821590185165405
+            },
+            {
+              "product_id": "126874694",
+              "product_name": "Conjunto de Potes de Vidro 3 Peças Mosaico com Tampa - Euro Home",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Utensílios e Acessórios Domésticos",
+              "num_reviews": 8,
+              "sentiment_score": 1.0,
+              "score": 0.6355123937129974,
+              "similarity": 0.47930341958999634
+            },
+            {
+              "product_id": "6942227",
+              "product_name": "Faqueiro Inox Tramontina Búzios 24 Peças",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Pratos e Talheres",
+              "num_reviews": 39,
+              "sentiment_score": 0.9743589743589745,
+              "score": 0.6314280415956791,
+              "similarity": 0.4844576418399811
+            },
+            {
+              "product_id": "128899431",
+              "product_name": "Conjunto de Potes de Vidro Multiuso 3 Peças Laranja - Euro Home",
+              "site_category_lv1": "Utilidades Domésticas",
+              "site_category_lv2": "Utensílios e Acessórios Domésticos",
+              "num_reviews": 7,
+              "sentiment_score": 1.0,
+              "score": 0.6284426391124726,
+              "similarity": 0.46920377016067505
+            }
+          ],
+          "risk_note": "Falha relevancia-sentimento: guarda-roupa -> rec #1 guarda-roupa quase identico com S=0.20 (num_reviews>=5), promovido ao topo por similaridade alta (~0.86) apesar do re-rank por sentimento."
+        }
+      ]
+    }
+  }
+}
