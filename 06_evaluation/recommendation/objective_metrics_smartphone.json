@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-07-04T02:31:49.102353+00:00",
+  "params": {
+    "top_n": 10,
+    "alpha": 0.7,
+    "relevance_threshold": 0.7,
+    "min_reviews": 5,
+    "ks": [
+      5,
+      10
+    ],
+    "relevance_definition": "min-max normalised avg_rating within category"
+  },
+  "category": "Celulares e Smartphones",
+  "category_recommendable_products": 250,
+  "query_product": {
+    "product_id": "132444092",
+    "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Platinum",
+    "avg_rating": 4.029239766081871,
+    "relevance": 0.7573099415204678,
+    "num_reviews": 342
+  },
+  "total_relevant_in_category": 126,
+  "metrics": {
+    "precision@5": 0.8,
+    "recall@5": 0.031746031746031744,
+    "ndcg@5": 0.9474043254673045,
+    "precision@10": 0.9,
+    "recall@10": 0.07142857142857142,
+    "ndcg@10": 0.9868126447450991
+  },
+  "recommendations": [
+    {
+      "product_id": "132444754",
+      "product_name": "Smartphone Motorola Moto G 5s Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dupla - Azul Topázio",
+      "avg_rating": 4.473684210526316,
+      "relevance": 0.868421052631579,
+      "is_relevant": true,
+      "similarity": 0.8618851900100708,
+      "sentiment_score": 0.9473684210526316,
+      "score": 0.8875301593228391
+    },
+    {
+      "product_id": "132444738",
+      "product_name": "Smartphone Motorola Moto G5S Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dupla - Platinum",
+      "avg_rating": 4.27741935483871,
+      "relevance": 0.8193548387096774,
+      "is_relevant": true,
+      "similarity": 0.8859031200408936,
+      "sentiment_score": 0.8774193548387097,
+      "score": 0.8833579904802384
+    },
+    {
+      "product_id": "132444050",
+      "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Dourado",
+      "avg_rating": 4.103139013452915,
+      "relevance": 0.7757847533632287,
+      "is_relevant": true,
+      "similarity": 0.8860490918159485,
+      "sentiment_score": 0.8475336322869955,
+      "score": 0.8744944539572626
+    },
+    {
+      "product_id": "132444771",
+      "product_name": "Smartphone Motorola Moto G 5s Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Snapdragon 625 32GB 4G 13MP Câmera Dual Cam - Ouro rosa",
+      "avg_rating": 4.377551020408164,
+      "relevance": 0.8443877551020409,
+      "is_relevant": true,
+      "similarity": 0.8604139685630798,
+      "sentiment_score": 0.8877551020408163,
+      "score": 0.8686163086064007
+    },
+    {
+      "product_id": "132444076",
+      "product_name": "Smartphone Motorola Moto G 5S Dual Chip Android 7.1.1 Nougat Tela 5.2\" Snapdragon 430 32GB 4G Câmera 16MP - Azul Safira",
+      "avg_rating": 3.6,
+      "relevance": 0.65,
+      "is_relevant": false,
+      "similarity": 0.8941184878349304,
+      "sentiment_score": 0.8,
+      "score": 0.8658829414844513
+    },
+    {
+      "product_id": "132222369",
+      "product_name": "Smartphone Motorola Moto G5 Plus Dual Chip Android Nougat 7.0 Tela 5,2\" Octa-Core 2GHz 2GB 4G Câmera 12MP - Azul Safira",
+      "avg_rating": 4.057142857142857,
+      "relevance": 0.7642857142857142,
+      "is_relevant": true,
+      "similarity": 0.8229703307151794,
+      "sentiment_score": 0.8571428571428571,
+      "score": 0.8332220886434827
+    },
+    {
+      "product_id": "132207724",
+      "product_name": "Smartphone Motorola Moto E4 Plus Dual Chip Android 7.1.1 Nougat Tela 5.5\" Quad-Core 1.3GHz 16GB 4G Câmera 13MP - Azul Safira",
+      "avg_rating": 4.333333333333333,
+      "relevance": 0.8333333333333333,
+      "is_relevant": true,
+      "similarity": 0.7931057214736938,
+      "sentiment_score": 0.9166666666666666,
+      "score": 0.8301740050315857
+    },
+    {
+      "product_id": "131348648",
+      "product_name": "Smartphone Moto G 5 Plus Dual Chip Android 7.0 Tela 5.2\" 32GB 4G Câmera 12MP - Ouro",
+      "avg_rating": 3.9642857142857144,
+      "relevance": 0.7410714285714286,
+      "is_relevant": true,
+      "similarity": 0.8317097425460815,
+      "sentiment_score": 0.8214285714285714,
+      "score": 0.8286253912108285
+    },
+    {
+      "product_id": "132531701",
+      "product_name": "Smartphone LG Q6 Plus Dual Chip Android 7.0 Tela 5.5\" Full Hd+ Snapdragon  MSM8940 64GB 4G Câmera 13MP - Platinum",
+      "avg_rating": 4.5,
+      "relevance": 0.875,
+      "is_relevant": true,
+      "similarity": 0.7446640133857727,
+      "sentiment_score": 1.0,
+      "score": 0.8212648093700409
+    },
+    {
+      "product_id": "132474081",
+      "product_name": "Smartphone Moto G 5S Dual Chip Android 7.0 Tela 5.2\" Snapdradon 32GB 4G Wi-Fi Câmera 16MP - Prata",
+      "avg_rating": 4.150943396226415,
+      "relevance": 0.7877358490566038,
+      "is_relevant": true,
+      "similarity": 0.7951681613922119,
+      "sentiment_score": 0.8742138364779874,
+      "score": 0.8188818639179446
+    }
+  ]
+}
