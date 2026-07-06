@@ -4,6 +4,10 @@ Projeto da disciplina de Processamento de Linguagem Natural — PPGCC/UFSCar.
 
 **Autores:** Cilene Renata Real · Jayme Sakae dos Reis Furuyama · Wesley Nogueira Galvão
 
+<p align="center">
+  <img src="docs/sentishop_demo.gif" alt="SentiShop" width="900">
+</p>
+
 ---
 
 ## Sobre o projeto
