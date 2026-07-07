@@ -1,0 +1,187 @@
+{
+  "report": "execution_time_benchmark",
+  "description": "Training time and test-set inference time for the classic sentiment classifiers of Pipeline 1. Models trained in-memory only — no checkpoints, .pkl, results JSON, or inference CSVs were written or overwritten. Generative (LLM) models are excluded by request; bertimbau_ft has no training code (planned) and is not benchmarked.",
+  "generated_at": "2026-07-07T01:23:14.926612+00:00",
+  "environment": {
+    "conda_env": "nlp_project",
+    "python": "3.13.14",
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+    "cpu_count": 16,
+    "torch": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3"
+  },
+  "dataset": {
+    "train_csv": "data/processed/B2W-Reviews01_no_neutral_train.csv",
+    "val_csv": "data/processed/B2W-Reviews01_no_neutral_val.csv",
+    "test_csv": "data/processed/B2W-Reviews01_no_neutral_test.csv",
+    "train_size": 69634,
+    "val_size": 23212,
+    "test_size": 23212
+  },
+  "timing_methodology": {
+    "clock": "time.perf_counter() wall-clock seconds",
+    "gpu_timing": "torch.cuda.synchronize() before/after GPU sections; one warm-up batch excluded",
+    "training_total_s": "sum of preprocessing + feature extraction/fit + hyperparam search + final fit",
+    "inference_total_s": "sum of preprocessing/feature extraction on the test split + model predict",
+    "grid_search": "n_jobs=-1 (all cores), same grid/k-folds/class-weights as the repo train scripts",
+    "latency_s_per_sample": "inference_test.total_s / samples — wall-clock seconds to classify ONE opinion (full pipeline: preprocessing/embedding + predict). predict_only_* isolates the classifier head cost, excluding feature extraction."
+  },
+  "models": {
+    "tfidf_lr_unigrams": {
+      "model": "tfidf_lr_unigrams",
+      "representation": "TF-IDF (lemmatized, max 50k features)",
+      "ngram_strategy": "unigrams",
+      "ngram_range": [
+        1,
+        1
+      ],
+      "device": "cpu",
+      "best_params": {
+        "C": 10.0,
+        "max_iter": 1000,
+        "solver": "saga"
+      },
+      "training": {
+        "lemmatization_train_s": 83.8722,
+        "vectorizer_fit_s": 0.5488,
+        "hyperparam_search_s": 5.3141,
+        "final_fit_best_params_s": 0.9237,
+        "total_s": 90.6588,
+        "note": "lemmatization_train_s is shared across the 3 ngram variants (measured once)"
+      },
+      "inference_test": {
+        "samples": 23212,
+        "lemmatization_test_s": 27.8335,
+        "vectorizer_transform_s": 0.1795,
+        "predict_s": 0.0011,
+        "total_s": 28.0141,
+        "throughput_samples_per_s": 828.6,
+        "latency_ms_per_sample": 1.2069,
+        "latency_s_per_sample": 0.00120688,
+        "predict_only_latency_s_per_sample": 4.74e-08,
+        "predict_only_latency_ms_per_sample": 4.6e-05,
+        "note": "lemmatization_test_s is shared across the 3 ngram variants (measured once)"
+      }
+    },
+    "tfidf_lr_bigrams": {
+      "model": "tfidf_lr_bigrams",
+      "representation": "TF-IDF (lemmatized, max 50k features)",
+      "ngram_strategy": "bigrams",
+      "ngram_range": [
+        2,
+        2
+      ],
+      "device": "cpu",
+      "best_params": {
+        "C": 10.0,
+        "max_iter": 1000,
+        "solver": "lbfgs"
+      },
+      "training": {
+        "lemmatization_train_s": 83.8722,
+        "vectorizer_fit_s": 1.4473,
+        "hyperparam_search_s": 5.924,
+        "final_fit_best_params_s": 2.3989,
+        "total_s": 93.6423,
+        "note": "lemmatization_train_s is shared across the 3 ngram variants (measured once)"
+      },
+      "inference_test": {
+        "samples": 23212,
+        "lemmatization_test_s": 27.8335,
+        "vectorizer_transform_s": 0.2831,
+        "predict_s": 0.001,
+        "total_s": 28.1175,
+        "throughput_samples_per_s": 825.5,
+        "latency_ms_per_sample": 1.2113,
+        "latency_s_per_sample": 0.00121133,
+        "predict_only_latency_s_per_sample": 4.31e-08,
+        "predict_only_latency_ms_per_sample": 4.2e-05,
+        "note": "lemmatization_test_s is shared across the 3 ngram variants (measured once)"
+      }
+    },
+    "tfidf_lr_both": {
+      "model": "tfidf_lr_both",
+      "representation": "TF-IDF (lemmatized, max 50k features)",
+      "ngram_strategy": "both",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "device": "cpu",
+      "best_params": {
+        "C": 10.0,
+        "max_iter": 1000,
+        "solver": "saga"
+      },
+      "training": {
+        "lemmatization_train_s": 83.8722,
+        "vectorizer_fit_s": 1.7336,
+        "hyperparam_search_s": 5.8933,
+        "final_fit_best_params_s": 1.5803,
+        "total_s": 93.0793,
+        "note": "lemmatization_train_s is shared across the 3 ngram variants (measured once)"
+      },
+      "inference_test": {
+        "samples": 23212,
+        "lemmatization_test_s": 27.8335,
+        "vectorizer_transform_s": 0.322,
+        "predict_s": 0.0013,
+        "total_s": 28.1568,
+        "throughput_samples_per_s": 824.4,
+        "latency_ms_per_sample": 1.213,
+        "latency_s_per_sample": 0.00121303,
+        "predict_only_latency_s_per_sample": 5.6e-08,
+        "predict_only_latency_ms_per_sample": 5.7e-05,
+        "note": "lemmatization_test_s is shared across the 3 ngram variants (measured once)"
+      }
+    },
+    "bertimbau_lr": {
+      "model": "bertimbau_lr",
+      "representation": "BERTimbau [CLS] embedding (frozen) + Logistic Regression",
+      "bert_model": "neuralmind/bert-base-portuguese-cased",
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "batch_size": 32,
+      "max_length": 256,
+      "embedding_dim": 768,
+      "best_params": {
+        "C": 1.0,
+        "max_iter": 1000,
+        "solver": "saga"
+      },
+      "training": {
+        "bert_tokenize_train_s": 11.6927,
+        "bert_forward_train_s": 221.6288,
+        "embedding_extraction_train_s": 233.3215,
+        "hyperparam_search_s": 794.1968,
+        "final_fit_best_params_s": 427.2318,
+        "total_s": 1454.7501
+      },
+      "inference_test": {
+        "samples": 23212,
+        "bert_tokenize_test_s": 3.2865,
+        "bert_forward_test_s": 70.8443,
+        "embedding_extraction_test_s": 74.1308,
+        "predict_s": 0.016513,
+        "total_s": 74.1473,
+        "throughput_samples_per_s": 313.1,
+        "latency_ms_per_sample": 3.1944,
+        "latency_s_per_sample": 0.00319435,
+        "predict_only_latency_s_per_sample": 7.114e-07
+      }
+    }
+  },
+  "notes": {
+    "excluded_generative_models": [
+      "llm_qwen_qwen3.5-9b",
+      "llm_google_gemma-4-12b-qat"
+    ],
+    "bertimbau_ft": "no training code in the repo (planned) — not benchmarked",
+    "artifacts": "no .csv / .json results / .pkl checkpoints / embedding caches were overwritten"
+  },
+  "wall_clock_total_s": 1717.68
+}
