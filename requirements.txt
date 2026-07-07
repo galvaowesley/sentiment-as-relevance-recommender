@@ -8,6 +8,9 @@ torch==2.6.0
 transformers==5.12.1
 nltk==3.9.1
 spacy==3.8.14
+# spaCy Portuguese model used for TF-IDF lemmatization (03_sentiment_classifier/tfidf_lr).
+# Installable via `python -m spacy download pt_core_news_sm` or the pinned wheel below.
+pt-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl
 zvec==0.5.0
 tqdm==4.68.3
 lmstudio==1.5.0
